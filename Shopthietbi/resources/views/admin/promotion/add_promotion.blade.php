@@ -3,9 +3,7 @@
     <div class="content">
         <div class="breadcrumb-wrapper breadcrumb-wrapper-2 breadcrumb-contacts">
             <h1>Chương trình khuyến mãi</h1>
-            <p class="breadcrumbs"><span><a href="index.html">Home</a></span>
-                <span><i class="mdi mdi-chevron-right"></i></span>Sub Category
-            </p>
+            
         </div>
         <div class="row">
             <div class="col-xl-4 col-lg-12">
@@ -62,7 +60,7 @@
                                 <div class="form-group row" id="brand_form" hidden>
                                     <label for="text" class="col-12 col-form-label">Thương hiệu khuyến mãi</label>
                                     <select name="brand_name" class="form-select">
-                                        <option value="">
+                                        <option value="" selected>
                                             --Chọn thương hiệu--</option>
                                         @foreach ($brand as $key => $brand)
                                             <option value="{{ $brand->brand_name }}">
@@ -108,11 +106,12 @@
                                     <tr>
                                         <th>Tên</th>
                                         <th>Mô tả</th>
+                                        <th>Thương hiệu</th>
                                         <th>Giá khuyến mãi</th>
                                         <th>Loại</th>
                                         <th>Khuyến mãi</th>
 
-                                        <th>Action</th>
+                                        <th></th>
                                     </tr>
                                 </thead>
 
@@ -123,6 +122,14 @@
                                             <td>{{ $v_promotion->promotion_name }}</td>
 
                                             <td>{{ $v_promotion->promotion_des }}</td>
+                                            <td>
+                                                @if ($v_promotion->brand_name == '')
+                                                    Không có
+                                                @else
+                                                {{ $v_promotion->brand_name }}
+                                                @endif
+                                                
+                                            </td>
                                             <td>{{ $v_promotion->promotion_price }}</td>
                                             <td>{{ $v_promotion->promotion_option }}</td>
                                             <td>

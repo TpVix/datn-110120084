@@ -433,11 +433,7 @@
                                         <span class="contact-info-label">Thời gian làm việc/Giờ:</span> T2 - CN / 8:00AM - 5:00PM
                                     </li>
                                 </ul>
-                                <div class="social-icons">
-                                    <a href="#" class="social-icon social-facebook icon-facebook" target="_blank" title="Facebook"></a>
-                                    <a href="#" class="social-icon social-twitter icon-twitter" target="_blank" title="Twitter"></a>
-                                    <a href="#" class="social-icon social-instagram icon-instagram" target="_blank" title="Instagram"></a>
-                                </div>
+                                
                                 <!-- End .social-icons -->
                             </div>
                             <!-- End .widget -->
@@ -876,34 +872,30 @@
             })
 
         });
-        $('.chose').on('change', (function() {
-            var action = $(this).attr('id');
-            var ma_id = $(this).val();
-            var _token = $('input[name="_token"]').val();
-            var result = '';
-
-            if (action == 'city') {
-                result = 'district';
-
-            } else {
-                result = 'ward';
-
-            }
-            $.ajax({
-                url: '{{ url('/select-delivery') }}',
-                method: 'POST',
-                data: {
-                    action: action,
-                    ma_id: ma_id,
-                    _token: _token
-                },
-                success: function(data) {
-
-                    $('#' + result).html(data);
-
-                }
-            })
-        }));
+        $('.chose').on('change',(function(){
+				var action = $(this).attr('id');
+				var ma_id = $(this).val();
+				var _token = $('input[name="_token"]').val();
+				var result = '';
+				
+				if(action =='city'){
+					result='district';
+					
+				}else{
+					result ='ward'; 
+					
+				}
+				$.ajax({
+					url: '{{url('/select-delivery')}}',
+					method:'POST',
+					data:{action:action,ma_id:ma_id,_token:_token},
+					success:function(data){
+					
+						$('#'+result).html(data);
+					
+					}
+				})
+			}));
     </script>
 </body>
 

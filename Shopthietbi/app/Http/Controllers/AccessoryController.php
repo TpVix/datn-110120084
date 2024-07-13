@@ -119,14 +119,19 @@ class AccessoryController extends Controller
         ->orderBy('tbl_product.product_id','desc')->get();
         return view('admin.accessory.product_accessory')->with(compact('all_product','accessory_ids','accessory_id','accessory_name','product_accessory'));
     }
-    public function chose_product_accessory($product_id)
+    public function chose_product_accessory(Request $request)
     {
-        $data=array();
-        $data['product_id'] =  $product_id;
-        $data['accessory_id'] = Session::get('accessory_id');
-        DB::table('tbl_accessory_product')
-        ->insert($data);
-
+        $product_ids = $request->input('ids');
+        $accessory_id = Session::get('accessory_id');
+        foreach ($product_ids as $product_id) {
+            $data = [
+                'product_id' => $product_id,
+                'accessory_id' => $accessory_id,
+            ];
+            DB::table('tbl_accessory_product')
+            ->insert($data);
+        }
+       
         Session::put('chose_success','Thêm thành công');
         return Redirect()->back();
     }
@@ -140,5 +145,131 @@ class AccessoryController extends Controller
         return Redirect()->back();
     }
 
+    public function add_promotion_accessory()
+    {
+        $this->AuthLogin();
+       
+        $promotion_accessory = DB::table('tbl_promotion_accessory')->orderBy('promotion_accessory_id','desc')->get();
+        $brand_name = [];
+        foreach ($promotion_accessory as $key => $v_promotion_accessory) {
+            if (!is_null($v_promotion_accessory->brand_name)) {
+                $brand_name[] = $v_promotion_accessory->brand_name;
+            }
+        }
 
+        $brand = Brand::orderBy('brand_id', 'desc')
+        ->whereNotIn('brand_name',$brand_name)
+        ->get();
+   
+        return view('admin.accessory.add_promotion_accessory')
+        ->with('promotion_accessory',$promotion_accessory)
+        ->with('brand', $brand);
+    }
+    public function save_promotion_accessory(Request $request)
+    {
+        $this->AuthLogin();
+        $data = array();
+        $data['brand_name'] = $request->brand_name;
+        $data['promotion_accessory_price'] = $request->promotion_accessory_price;
+        $data['promotion_accessory_des'] = $request->promotion_accessory_des;
+        $data['promotion_accessory_status'] = $request->promotion_accessory_status;
+        $data['promotion_accessory_option'] = $request->promotion_accessory_option;
+        DB::table('tbl_promotion_accessory')->insert($data);
+        Session::put('message', 'Thêm thành công');
+
+
+        
+        return Redirect::to('/add-promotion-accessory');
+
+
+    }
+    public function edit_promotion_accessory($promotion_accessory_id,Request $request)
+    {
+      
+        $this->AuthLogin();
+        $brand = Brand::orderBy('brand_id', 'desc')->get();
+        $promotion_accessory = DB::table('tbl_promotion_accessory')->orderBy('promotion_accessory_id','desc')->get();
+        $promotion_accessory_edit = DB::table('tbl_promotion_accessory')->where('promotion_accessory_id',$promotion_accessory_id)->first();
+        return view('admin.accessory.edit_promotion_accessory')
+        ->with('promotion_accessory',$promotion_accessory)
+        ->with('brand', $brand)
+        ->with('promotion_accessory_edit',$promotion_accessory_edit);
+
+
+    }
+    public function update_promotion_accessory($promotion_accessory_id,Request $request)
+    {
+        $this->AuthLogin();
+        $data = array();
+        $data['brand_name'] = $request->brand_name;
+        $data['promotion_accessory_price'] = $request->promotion_accessory_price;
+        $data['promotion_accessory_des'] = $request->promotion_accessory_des;
+        $data['promotion_accessory_status'] = $request->promotion_accessory_status;
+        $data['promotion_accessory_option'] = $request->promotion_accessory_option;
+        DB::table('tbl_promotion_accessory')->where('promotion_accessory_id',$promotion_accessory_id)->update($data);
+        Session::put('message', 'Chỉnh sửa thành công');
+        
+        return Redirect::to('/add-promotion-accessory');
+
+
+    }
+    public function delete_promotion_accessory($promotion_accessory_id,Request $request)
+    {
+        $product_promotion_accessory = DB::table('tbl_promotion_accessory_product')
+        ->where('promotion_accessory_id', $promotion_accessory_id)->first();
+        if (isset($product_promotion_accessory)) {
+            Session::put('delete','Không thể xoá do còn thành phần phụ');
+            return Redirect::to('/add-promotion-accessory');
+        }else {
+            DB::table('tbl_promotion_accessory')->where('promotion_accessory_id',$promotion_accessory_id)->delete();
+            Session::put('delete','Xoá thành công');
+            return Redirect::to('/add-promotion-accessory');
+        }
+    }
+    public function product_promotion_accessory($promotion_accessory_id,Request $request)
+    {
+       Session::put('promotion_accessory_id',$promotion_accessory_id);
+       $promotion_accessory_ids = DB::table('tbl_promotion_accessory_product')
+       ->where('tbl_promotion_accessory_product.promotion_accessory_id',$promotion_accessory_id)
+       ->get();
+       
+        $promotion_accessory_name = DB::table('tbl_promotion_accessory')->where('promotion_accessory_id',$promotion_accessory_id)->first();
+        
+       
+            $all_product = DB::table('tbl_product')
+            ->where('category_id',0)
+            ->orderBy('product_id','desc')->get();
+      
+        $product_promotion_accessory = DB::table('tbl_product')
+        ->Join('tbl_promotion_accessory_product', 'tbl_product.product_id', '=', 'tbl_promotion_accessory_product.product_id')
+        ->Join('tbl_promotion_accessory', 'tbl_promotion_accessory.promotion_accessory_id', '=', 'tbl_promotion_accessory_product.promotion_accessory_id')
+        ->where('tbl_promotion_accessory_product.promotion_accessory_id',$promotion_accessory_id)
+        ->orderBy('tbl_product.product_id','desc')->get();
+      
+        return view('admin.accessory.product_promotion_accessory')->with(compact('all_product','promotion_accessory_ids','promotion_accessory_id','promotion_accessory_name','product_promotion_accessory'));
+    }
+    public function chose_promotion_accessory_product(Request $request)
+    {
+        
+        $product_ids = $request->input('ids');
+        $promotion_accessory_id = Session::get('promotion_accessory_id');
+        foreach ($product_ids as $product_id) {
+            $data = [
+                'product_id' => $product_id,
+                'promotion_accessory_id' => $promotion_accessory_id,
+            ];
+            DB::table('tbl_promotion_accessory_product')->insert($data);
+        }
+        Session::put('chose','Thêm thành công');
+        return Redirect()->back();
+    }
+    public function delete_product_promotion_accessory($product_id)
+    {
+        DB::table('tbl_promotion_accessory_product')
+        ->where('promotion_accessory_id', Session::get('promotion_accessory_id'))
+        ->where('product_id', $product_id)
+        ->delete();
+        Session::put('chose_success','Xoá thành công');
+        return Redirect()->back();
+    }
 }

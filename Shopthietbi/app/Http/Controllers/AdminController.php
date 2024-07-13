@@ -30,6 +30,7 @@ class AdminController extends Controller
     }
     public function admin_register()
     {
+        $this -> AuthLogin();
         return view('admin_register');
     }
     public function dashboard()
@@ -109,6 +110,7 @@ class AdminController extends Controller
     }
     public function account_profile($admin_id)
     {
+        $this -> AuthLogin();
         $admin = DB::table('tbl_admin')->where('admin_id', Session::get('admin_id'))
             ->join('tbl_role', 'tbl_role.role_id', '=', 'tbl_admin.role_id')
             ->first();
@@ -117,6 +119,7 @@ class AdminController extends Controller
     }
     public function update_profile($admin_id, Request $request)
     {
+        $this -> AuthLogin();
         $admin = DB::table('tbl_admin')->where('admin_id', Session::get('admin_id'))->first();
 
         if (isset($request->old_password, $request->new_password) && Hash::check($request->old_password, $admin->admin_password)) {
@@ -134,6 +137,7 @@ class AdminController extends Controller
     }
     public function update_phone($admin_id, Request $request)
     {
+        $this -> AuthLogin();
         $data = array();
         $data['admin_phone'] = $request->admin_phone;
         DB::table('tbl_admin')->where('admin_id', Session::get('admin_id'))->update($data);
@@ -175,6 +179,7 @@ class AdminController extends Controller
     // }
     public function save_admin(Request $request)
     {
+        $this -> AuthLogin();
         $admin = new Login();
 
         $data = $request->all();
@@ -214,7 +219,7 @@ class AdminController extends Controller
         $this->AuthLogin();
 
         $customer_all = DB::table('tbl_customers')
-        ->join('tbl_order', 'tbl_order.customer_id', '=', 'tbl_customers.customer_id')
+        ->leftjoin('tbl_order', 'tbl_order.customer_id', '=', 'tbl_customers.customer_id')
         ->select(
             'tbl_customers.customer_id',
             DB::raw('count(tbl_order.order_id) as order_count'),
@@ -223,11 +228,12 @@ class AdminController extends Controller
         ->groupBy('tbl_customers.customer_id')
         ->orderBy('total_order_amount','desc')
         ->get();
-
+        
         return view('admin.customer.list_add_customer')->with(compact('customer_all'));
     }
     public function permisstion($role_id, Request $request)
     {
+        $this -> AuthLogin();
         $admin_id = $request->admin_id;
         if ($admin_id == Session::get('admin_id')) {
             Session::put('permisstion', 'Không được phân quyền cho chính mình');
@@ -240,6 +246,7 @@ class AdminController extends Controller
     }
     public function delete_account($admin_id)
     {
+        $this -> AuthLogin();
         $admin_role = DB::table('tbl_admin')->where('admin_id', $admin_id)->first();
         if ($admin_id == Session::get('admin_id') || $admin_role->role_id == '1') {
             Session::put('delete_account', 'Tài khoản này không thể bị xoá');

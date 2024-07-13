@@ -168,7 +168,12 @@ class CustomerController extends Controller
     }
     public function callback_google()
     {
-        $users = Socialite::driver('google')->stateless()->user();
+        try {
+            $users = Socialite::driver('google')->stateless()->user();
+        } catch (\Exception $e) {
+            // Nếu người dùng chọn hủy xác thực, bắt ngoại lệ và chuyển hướng về trang đăng nhập hoặc trang chủ với thông báo lỗi.
+            return redirect('/login-register');
+        }
         // return $users->id;
         $authUser = $this->findOrCreateUser($users, 'google');
         if ($authUser) {
@@ -251,17 +256,14 @@ class CustomerController extends Controller
 
         foreach ($value_order_detail as $v_order) {
 
-            // Lấy số lượng sản phẩm hiện tại từ bảng sản phẩm
             $qty_old = DB::table('tbl_product')
                 ->where('product_id', $v_order->product_id)
                 ->first();
 
             if ($qty_old) {
-                // Tính số lượng sản phẩm mới sau khi trừ đi số lượng đã đặt
                 $new = array();
                 $new['product_quantity'] = $qty_old->product_quantity + $v_order->product_quantity;
                 $new['quantity_sold'] = $qty_old->quantity_sold - $v_order->product_quantity;
-                // Cập nhật số lượng sản phẩm mới vào bảng sản phẩm
                 DB::table('tbl_product')
                     ->where('product_id', $qty_old->product_id)
                     ->update($new);
@@ -269,7 +271,7 @@ class CustomerController extends Controller
         }
 
 
-        Session::put('message', 'Huỷ thành công');
+        Session::put('cancel_order', 'Huỷ thành công');
         return Redirect()->back();
     }
     public function checked_order($order_id)
@@ -294,7 +296,7 @@ class CustomerController extends Controller
             ->orderBy('tbl_order.order_id', 'desc')->first();
 
         $order_detail = DB::table('tbl_order_detail')->where('tbl_order_detail.order_id', $order_id)->get();
-
+        
         return view('pages.customer.order_detail')
             ->with('cart_detail', $cart_detail)
             ->with('category', $category)

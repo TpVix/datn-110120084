@@ -59,7 +59,7 @@
 
                     <div class="info-box-content">
                         <h4>HỖ TRỢ</h4>
-                        <p class="text-body">Thông qua chatbot</p>
+                        <p class="text-body">Email: vitran641@gmail.com</p>
                     </div>
                     <!-- End .info-box-content -->
                 </div>
@@ -272,199 +272,205 @@
                 <!-- End .featured-proucts -->
             </div>
         </section>
-
+        
         <section class="new-products-section">
-            <div class="container">
-                <h2 class="section-title heading-border ls-20 border-0">Sản phẩm mới</h2>
-
-                <div class="products-slider custom-products owl-carousel owl-theme nav-outer show-nav-hover nav-image-center mb-2"
-                    data-owl-options="{
-                'dots': false,
-                'nav': true,
-                'responsive': {
-                    '992': {
-                        'items': 4
-                    },
-                    '1200': {
-                        'items': 5
+            
+                
+                <div class="container">
+                    @if ($new_product!= '[]')
+                    <h2 class="section-title heading-border ls-20 border-0">Sản phẩm mới</h2>
+                    @else
+                    
+                    @endif
+                    <div class="products-slider custom-products owl-carousel owl-theme nav-outer show-nav-hover nav-image-center mb-2"
+                        data-owl-options="{
+                    'dots': false,
+                    'nav': true,
+                    'responsive': {
+                        '992': {
+                            'items': 4
+                        },
+                        '1200': {
+                            'items': 5
+                        }
                     }
-                }
-            }">
-                    @foreach ($new_product as $key => $new_product)
-                        <div class="product-default" data-animation-name="fadeInRightShorter">
-                            <figure>
-                                <a href="{{ URL::to('/san-pham/' . $new_product->product_slug) }}">
-                                    <img src="{{ URL::to('public/upload/' . $new_product->product_image) }}"style="height: 220px;width:220px;"
-                                        alt="product">
-                                    <img src="{{ URL::to('public/upload/' . $new_product->product_image) }}"
-                                        style="transform: scaleX(-1);height: 220px;width:220px;" alt="product">
-                                </a>
-                                {{-- @if ($new_product->product_status == '1')
-                        <div class="label-group">
-                            <div class="product-label label-hot"> 
-                                Giảm: {{ round(100 - (($new_product->product_sale_price / $new_product->product_price) * 100)) }}%
-                            </div>
-                        </div>
-                        @else
-                        
-                        @endif --}}
-
-                            </figure>
-                            <div class="product-details">
-                               
-                                <h3 class="product-title">
-                                    <a href="{{ URL::to('/san-pham/' . $new_product->product_slug) }}">{{ $new_product->product_name }}</a>
-                                </h3>
-                                <div>
-                                    <ul style="display: flex;">
-                                        @php
-                                            $count_new_product = 0;
-                                            $mean_new_product = 0;
-                                            $total_start_new_product = 0;
-
-                                            $rating = DB::table('tbl_rating')
-                                               
-                                                ->where('product_id', $new_product->product_id)
-                                                ->orderBy('rating_id', 'desc')
-                                                ->get();
-                                            foreach ($rating as $key => $v_rating) {
-                                                $count_new_product++;
-                                                $total_start_new_product += $v_rating->rating_start;
-                                            }
-
-                                            if ($count_new_product == 0) {
-                                                $mean_new_product = round($total_start_new_product);
-                                            } else {
-                                                $mean_new_product = round(
-                                                    $total_start_new_product / $count_new_product,
-                                                );
-                                            }
-
-                                        @endphp
-                                        @for ($i = 1; $i <= 5; $i++)
-                                            @php
-                                                if ($i <= $mean_new_product) {
-                                                    $color = 'color:#706f6c;';
-                                                } else {
-                                                    $color = 'color:#ccc;';
-                                                }
-                                            @endphp
-
-
-                                            <li id="" data-index="" data-product_id="" data-rating=""
-                                                class="rating"
-                                                style="cursor: pointer;{{ $color }} font-size: 25px;">
-                                                &#9733;
-                                            </li>
-                                        @endfor
-                                    </ul>
-                                    <!-- End .product-ratings -->
+                }">
+                        @foreach ($new_product as $key => $new_product)
+                            <div class="product-default" data-animation-name="fadeInRightShorter">
+                                <figure>
+                                    <a href="{{ URL::to('/san-pham/' . $new_product->product_slug) }}">
+                                        <img src="{{ URL::to('public/upload/' . $new_product->product_image) }}"style="height: 220px;width:220px;"
+                                            alt="product">
+                                        <img src="{{ URL::to('public/upload/' . $new_product->product_image) }}"
+                                            style="transform: scaleX(-1);height: 220px;width:220px;" alt="product">
+                                    </a>
+                                    {{-- @if ($new_product->product_status == '1')
+                            <div class="label-group">
+                                <div class="product-label label-hot"> 
+                                    Giảm: {{ round(100 - (($new_product->product_sale_price / $new_product->product_price) * 100)) }}%
                                 </div>
-                                <!-- End .product-container -->
-                                @if ($new_product->promotion_id != 0)
-                                    @php
-                                        $active_promotion_new = DB::table('tbl_promotion')
-                                            
-                                            ->where('promotion_id', $new_product->promotion_id)
-                                            ->get();
-                                    @endphp
-                                    <div class="price-box">
-                                        
-                                        @foreach ($active_promotion_new as $v_active_promotion)
-                                        
-                                            @if ($v_active_promotion->promotion_status == 'Có')
-                                                @if ($v_active_promotion->promotion_option == '%')
-                                                <del class="old-price">{{ number_format($new_product->product_price) }}</del><br>
-                                                <span style="color:red;"
-                                                    class="product-price">{{ number_format(($new_product->product_price * (100 - $v_active_promotion->promotion_price)) / 100) . ' ' . 'VNĐ' }}</span>
-                                                @else
-                                                <del class="old-price">{{ number_format($new_product->product_price) }}</del><br>
-                                                    <span style="color:red;"
-                                                        class="product-price">{{ number_format($new_product->product_price - $v_active_promotion->promotion_price) . ' ' . 'VNĐ' }}</span>
-                                                @endif
-                                            @else
-                                                    <del class="old-price"></del><br>
-                                                    <span style="color:red;"
-                                                        class="product-price">{{ number_format($new_product->product_price) . ' ' . 'VNĐ' }}</span>
-                                            
-                                            @endif
-                                        @endforeach
+                            </div>
+                            @else
+                            
+                            @endif --}}
+    
+                                </figure>
+                                <div class="product-details">
+                                   
+                                    <h3 class="product-title">
+                                        <a href="{{ URL::to('/san-pham/' . $new_product->product_slug) }}">{{ $new_product->product_name }}</a>
+                                    </h3>
+                                    <div>
+                                        <ul style="display: flex;">
+                                            @php
+                                                $count_new_product = 0;
+                                                $mean_new_product = 0;
+                                                $total_start_new_product = 0;
+    
+                                                $rating = DB::table('tbl_rating')
+                                                   
+                                                    ->where('product_id', $new_product->product_id)
+                                                    ->orderBy('rating_id', 'desc')
+                                                    ->get();
+                                                foreach ($rating as $key => $v_rating) {
+                                                    $count_new_product++;
+                                                    $total_start_new_product += $v_rating->rating_start;
+                                                }
+    
+                                                if ($count_new_product == 0) {
+                                                    $mean_new_product = round($total_start_new_product);
+                                                } else {
+                                                    $mean_new_product = round(
+                                                        $total_start_new_product / $count_new_product,
+                                                    );
+                                                }
+    
+                                            @endphp
+                                            @for ($i = 1; $i <= 5; $i++)
+                                                @php
+                                                    if ($i <= $mean_new_product) {
+                                                        $color = 'color:#706f6c;';
+                                                    } else {
+                                                        $color = 'color:#ccc;';
+                                                    }
+                                                @endphp
+    
+    
+                                                <li id="" data-index="" data-product_id="" data-rating=""
+                                                    class="rating"
+                                                    style="cursor: pointer;{{ $color }} font-size: 25px;">
+                                                    &#9733;
+                                                </li>
+                                            @endfor
+                                        </ul>
+                                        <!-- End .product-ratings -->
                                     </div>
-                                @else
-                                    <div class="price-box">
-                                        <del class="old-price"></del><br>
-                                        <span style="color:red;"
-                                            class="product-price">{{ number_format($new_product->product_price) . ' ' . 'VNĐ' }}</span>
-                                    </div>
-                                @endif
-                                <p style="color:#999;font-size: 1.4rem;">Đã bán: {{ $new_product->quantity_sold }}</p>
-
-                                <!-- End .price-box -->
-                                <div class="product-action">
-
-
-                                    <form action="{{ URL::to('/add-cart') }}" method="post">
-                                        @csrf
-                                        <input type="hidden" name="cart_product_id"
-                                            value="{{ $new_product->product_id }}"
-                                            class="cart_product_id_{{ $new_product->product_id }}">
-                                        <input type="hidden" name="cart_product_name"
-                                            value="{{ $new_product->product_name }}"
-                                            class="cart_product_name_{{ $new_product->product_id }}">
-                                        <input type="hidden" name="cart_product_image"
-                                            value="{{ $new_product->product_image }}"
-                                            class="cart_product_image_{{ $new_product->product_id }}">
-                                        @if ($new_product->promotion_id != 0)
+                                    <!-- End .product-container -->
+                                    @if ($new_product->promotion_id != 0)
                                         @php
                                             $active_promotion_new = DB::table('tbl_promotion')
+                                                
                                                 ->where('promotion_id', $new_product->promotion_id)
                                                 ->get();
                                         @endphp
+                                        <div class="price-box">
+                                            
                                             @foreach ($active_promotion_new as $v_active_promotion)
+                                            
                                                 @if ($v_active_promotion->promotion_status == 'Có')
                                                     @if ($v_active_promotion->promotion_option == '%')
-                                                        <input type="hidden" name="cart_product_price"
-                                                            value="{{ ($new_product->product_price * (100 - $v_active_promotion->promotion_price)) / 100 }}"
-                                                            class="cart_product_price_{{ $new_product->product_id }}">
+                                                    <del class="old-price">{{ number_format($new_product->product_price) }}</del><br>
+                                                    <span style="color:red;"
+                                                        class="product-price">{{ number_format(($new_product->product_price * (100 - $v_active_promotion->promotion_price)) / 100) . ' ' . 'VNĐ' }}</span>
                                                     @else
-                                                        <input type="hidden" name="cart_product_price"
-                                                            value="{{ $new_product->product_price - $v_active_promotion->promotion_price }}"
-                                                            class="cart_product_price_{{ $new_product->product_id }}">
+                                                    <del class="old-price">{{ number_format($new_product->product_price) }}</del><br>
+                                                        <span style="color:red;"
+                                                            class="product-price">{{ number_format($new_product->product_price - $v_active_promotion->promotion_price) . ' ' . 'VNĐ' }}</span>
                                                     @endif
                                                 @else
-                                                    <input type="hidden" name="cart_product_price"
-                                                    value="{{ $new_product->product_price }}"
-                                                    class="cart_product_price_{{ $new_product->product_id }}">
+                                                        <del class="old-price"></del><br>
+                                                        <span style="color:red;"
+                                                            class="product-price">{{ number_format($new_product->product_price) . ' ' . 'VNĐ' }}</span>
+                                                
                                                 @endif
                                             @endforeach
-                                        @else
-                                            <input type="hidden" name="cart_product_price"
-                                                value="{{ $new_product->product_price }}"
-                                                class="cart_product_price_{{ $new_product->product_id }}">
-                                        @endif
-
-                                        <input type="hidden" name="cart_product_qty" value="1" class="">
-                                        <?php
-                                        $customer_id = Session::get('customer_id');
-                                        ?>
-                                        @if ($customer_id == null)
-                                            <a href="{{ URL::to('/login-register') }}"
-                                                class="btn-icon btn-add-cart1 product-type-simple">ĐĂNG NHẬP ĐỂ ĐẶT
-                                                HÀNG</a>
-                                        @else
-                                            <button type="submit" href="#"
-                                                class="btn-icon btn-add-cart1 product-type-simple"><i
-                                                    class="icon-shopping-cart"></i><span>THÊM VÀO GIỎ HÀNG</span></button>
-                                        @endif
-                                    </form>
-
+                                        </div>
+                                    @else
+                                        <div class="price-box">
+                                            <del class="old-price"></del><br>
+                                            <span style="color:red;"
+                                                class="product-price">{{ number_format($new_product->product_price) . ' ' . 'VNĐ' }}</span>
+                                        </div>
+                                    @endif
+                                    <p style="color:#999;font-size: 1.4rem;">Đã bán: {{ $new_product->quantity_sold }}</p>
+    
+                                    <!-- End .price-box -->
+                                    <div class="product-action">
+    
+    
+                                        <form action="{{ URL::to('/add-cart') }}" method="post">
+                                            @csrf
+                                            <input type="hidden" name="cart_product_id"
+                                                value="{{ $new_product->product_id }}"
+                                                class="cart_product_id_{{ $new_product->product_id }}">
+                                            <input type="hidden" name="cart_product_name"
+                                                value="{{ $new_product->product_name }}"
+                                                class="cart_product_name_{{ $new_product->product_id }}">
+                                            <input type="hidden" name="cart_product_image"
+                                                value="{{ $new_product->product_image }}"
+                                                class="cart_product_image_{{ $new_product->product_id }}">
+                                            @if ($new_product->promotion_id != 0)
+                                            @php
+                                                $active_promotion_new = DB::table('tbl_promotion')
+                                                    ->where('promotion_id', $new_product->promotion_id)
+                                                    ->get();
+                                            @endphp
+                                                @foreach ($active_promotion_new as $v_active_promotion)
+                                                    @if ($v_active_promotion->promotion_status == 'Có')
+                                                        @if ($v_active_promotion->promotion_option == '%')
+                                                            <input type="hidden" name="cart_product_price"
+                                                                value="{{ ($new_product->product_price * (100 - $v_active_promotion->promotion_price)) / 100 }}"
+                                                                class="cart_product_price_{{ $new_product->product_id }}">
+                                                        @else
+                                                            <input type="hidden" name="cart_product_price"
+                                                                value="{{ $new_product->product_price - $v_active_promotion->promotion_price }}"
+                                                                class="cart_product_price_{{ $new_product->product_id }}">
+                                                        @endif
+                                                    @else
+                                                        <input type="hidden" name="cart_product_price"
+                                                        value="{{ $new_product->product_price }}"
+                                                        class="cart_product_price_{{ $new_product->product_id }}">
+                                                    @endif
+                                                @endforeach
+                                            @else
+                                                <input type="hidden" name="cart_product_price"
+                                                    value="{{ $new_product->product_price }}"
+                                                    class="cart_product_price_{{ $new_product->product_id }}">
+                                            @endif
+    
+                                            <input type="hidden" name="cart_product_qty" value="1" class="">
+                                            <?php
+                                            $customer_id = Session::get('customer_id');
+                                            ?>
+                                            @if ($customer_id == null)
+                                                <a href="{{ URL::to('/login-register') }}"
+                                                    class="btn-icon btn-add-cart1 product-type-simple">ĐĂNG NHẬP ĐỂ ĐẶT
+                                                    HÀNG</a>
+                                            @else
+                                                <button type="submit" href="#"
+                                                    class="btn-icon btn-add-cart1 product-type-simple"><i
+                                                        class="icon-shopping-cart"></i><span>THÊM VÀO GIỎ HÀNG</span></button>
+                                            @endif
+                                        </form>
+    
+                                    </div>
                                 </div>
+                                <!-- End .product-details -->
                             </div>
-                            <!-- End .product-details -->
-                        </div>
-                    @endforeach
-                </div>
-
+                        @endforeach
+                        
+                    </div>
+                
                 @foreach ($active_promotion as $v_active_promotion)
                     @php
                         $product_promotion = DB::table('tbl_product')

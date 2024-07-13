@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -153,7 +152,7 @@ Route::get('/delete-image/{image_id}', 'ProductController@delete_image');
 //promotion
 Route::get('/add-promotion', 'PromotionController@add_promotion');
 Route::get('/product-promotion/{promotion_id}', 'PromotionController@product_promotion');
-Route::get('/chose-product/{product_id}', 'PromotionController@chose_product');
+Route::post('/chose-product', 'PromotionController@chose_product');
 Route::get('/delete-product-promotion/{product_id}', 'PromotionController@delete_product_promotion');
 
 Route::post('/save-promotion', 'PromotionController@save_promotion');
@@ -163,13 +162,23 @@ Route::get('/delete-promotion/{promotion_id}', 'PromotionController@delete_promo
 //accessory
 Route::get('/add-accessory', 'AccessoryController@add_accessory');
 Route::get('/product-accessory/{accessory_id}', 'AccessoryController@product_accessory');
-Route::get('/chose-product-accessory/{product_id}', 'AccessoryController@chose_product_accessory');
+Route::post('/chose-product-accessory', 'AccessoryController@chose_product_accessory');
 Route::get('/delete-product-accessory/{product_id}', 'AccessoryController@delete_product_accessory');
 
 Route::post('/save-accessory', 'AccessoryController@save_accessory');
 Route::get('/edit-accessory/{accessory_id}', 'AccessoryController@edit_accessory');
 Route::post('/update-accessory/{accessory_id}', 'AccessoryController@update_accessory');
 Route::get('/delete-accessory/{accessory_id}', 'AccessoryController@delete_accessory');
+//Promotion Accessory
+Route::get('/add-promotion-accessory', 'AccessoryController@add_promotion_accessory');
+Route::get('/product-promotion-accessory/{promotion_accessory_id}', 'AccessoryController@product_promotion_accessory');
+Route::post('/chose-promotion-accessory-product', 'AccessoryController@chose_promotion_accessory_product');
+Route::get('/delete-product-promotion-accessory/{product_id}', 'AccessoryController@delete_product_promotion_accessory');
+
+Route::post('/save-promotion-accessory', 'AccessoryController@save_promotion_accessory');
+Route::get('/edit-promotion-accessory/{promotion_accessory_id}', 'AccessoryController@edit_promotion_accessory');
+Route::post('/update-promotion-accessory/{promotion_accessory_id}', 'AccessoryController@update_promotion_accessory');
+Route::get('/delete-promotion-accessory/{promotion_accessory_id}', 'AccessoryController@delete_promotion_accessory');
 //Manage Order
 Route::group(['middleware' => ['auth:admin', 'checkAdminRole:Quản trị viên,Quản lý']], function () {
     Route::get('/print-order/{checkout_code}', 'OrderController@print_order');
@@ -181,11 +190,11 @@ Route::group(['middleware' => ['auth:admin', 'checkAdminRole:Quản trị viên,
 //Delivery
 Route::group(['middleware' => ['auth:admin', 'checkAdminRole:Quản trị viên,Quản lý']], function () {
     Route::get('/manage-delivery', 'DeliveryController@manage_delivery');
-    Route::post('/select-delivery', 'DeliveryController@select_delivery');
     Route::post('/insert-delivery', 'DeliveryController@insert_delivery');
     Route::post('/select-shipping-fee', 'DeliveryController@select_shipping_fee');
     Route::post('/update-delivery', 'DeliveryController@update_delivery');
 });
+Route::post('/select-delivery', 'DeliveryController@select_delivery');
 //Reviews - comment
 Route::get('/list-review', 'ReviewController@list_review');
 Route::get('/list-comment', 'ReviewController@list_comment');

@@ -5,8 +5,7 @@
             <h4 class="title mb-3">Thêm địa chỉ</h4>
 
             <form>
-                {{ csrf_field() }}
-
+                @csrf
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">

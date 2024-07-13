@@ -60,7 +60,7 @@ class CartController extends Controller
             ->where('product_id', $product_id)
             ->where('customer_id', Session::get('customer_id'))
             ->delete();
-        Session::put('message', 'Xoá thành công');
+        
 
         return Redirect()->back();
     }

@@ -28,9 +28,18 @@ class PromotionController extends Controller
     {
         $this->AuthLogin();
         $category = Category::orderBy('category_id', 'desc')->get();
-        $brand = Brand::orderBy('brand_id', 'desc')->get();
-
         $promotion = DB::table('tbl_promotion')->orderBy('promotion_id','desc')->get();
+        $brand_name = [];
+        foreach ($promotion as $key => $v_promotion) {
+            if (!is_null($v_promotion->brand_name)) {
+                $brand_name[] = $v_promotion->brand_name;
+            }
+        }
+       
+        $brand = Brand::orderBy('brand_id', 'desc')
+        ->whereNotIn('brand_name',$brand_name)
+        ->get();
+   
         return view('admin.promotion.add_promotion')->with('category', $category)
         ->with('promotion',$promotion)
         ->with('brand', $brand);
@@ -102,23 +111,46 @@ class PromotionController extends Controller
     public function product_promotion($promotion_id,Request $request)
     {
        Session::put('promotion_id',$promotion_id);
-        $all_product = DB::table('tbl_product')
-        ->leftJoin('tbl_category_product', 'tbl_category_product.category_id', '=', 'tbl_product.category_id')
-        ->leftJoin('tbl_brand', 'tbl_brand.brand_id', '=', 'tbl_product.brand_id')
-        ->orderBy('product_id','desc')->get();
-
+        
+       $promotion_ids = DB::table('tbl_product')
+       ->where('promotion_id',$promotion_id)
+       ->get();
+      
         $promotion_name = DB::table('tbl_promotion')->where('promotion_id',$promotion_id)->first();
-       
+        
+        if ($promotion_name->brand_name != '' ) {
+            $all_product = DB::table('tbl_product')
+            ->leftJoin('tbl_category_product', 'tbl_category_product.category_id', '=', 'tbl_product.category_id')
+            ->leftJoin('tbl_brand', 'tbl_brand.brand_id', '=', 'tbl_product.brand_id')
+            ->where('tbl_brand.brand_name',$promotion_name->brand_name)
+            ->orderBy('product_id','desc')->get();
+
+           
+        } else {
+            $all_product = DB::table('tbl_product')
+            ->leftJoin('tbl_category_product', 'tbl_category_product.category_id', '=', 'tbl_product.category_id')
+            ->leftJoin('tbl_brand', 'tbl_brand.brand_id', '=', 'tbl_product.brand_id')
+            ->where('promotion_id',0)
+            ->where('tbl_product.category_id','!=',0)
+            ->orderBy('product_id','desc')->get();
+           
+        }
+        
+      
         $product_promotion = DB::table('tbl_product')
         ->where('promotion_id',$promotion_id)
         ->orderBy('product_id','desc')->get();
-        return view('admin.promotion.product_promotion')->with(compact('all_product','promotion_id','promotion_name','product_promotion'));
+        return view('admin.promotion.product_promotion')->with(compact('all_product','promotion_id','promotion_ids','promotion_name','product_promotion'));
     }
-    public function chose_product($product_id)
+    public function chose_product(Request $request)
     {
-        DB::table('tbl_product')
-        ->where('product_id', $product_id)
-        ->update(['promotion_id' => Session::get('promotion_id')]);
+        $product_ids = $request->input('ids');
+        $promotion_id = Session::get('promotion_id');
+        foreach ($product_ids as $product_id) {
+            DB::table('tbl_product')
+            ->where('product_id', $product_id)
+            ->update(['promotion_id' => $promotion_id]);
+        }   
 
         Session::put('chose_success','Thêm thành công');
         return Redirect()->back();

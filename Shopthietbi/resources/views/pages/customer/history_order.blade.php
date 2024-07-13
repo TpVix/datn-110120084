@@ -10,20 +10,20 @@
                 <thead>
                     <tr>
                         <th class="order-id">Đơn hàng</th>
-                        <th style="width: 15%;" class="order-date">Ngày đặt</th>
+                        <th style="width: 20%;" class="order-date">Ngày đặt</th>
                         <th style="width: 15%;" class="order-status">Trạng thái</th>
-                        <th class="order-price">Giá tiền</th>
-                        <th class="order-action"></th>
+                        <th class="order-price text-center">Giá tiền</th>
+                        <th class="order-action" style="width: 10%;"></th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($history_order as $key =>$history_order )
                     <?php
-                    $message = Session::get('message');
-                    if ($message) {
-                        echo "<div class='alert alert-success'>$message</div>";
+                    $cancel_order = Session::get('cancel_order');
+                    if ($cancel_order) {
+                        echo "<div class='alert alert-success'>$cancel_order</div>";
                         for ($i=1; $i <3 ; $i++) { 
-                            Session::put('message', null);
+                            Session::put('cancel_order', null);
                         }
                         
                     }
@@ -45,16 +45,16 @@
                             </p>
                         </td>
                         <td class=" p-0" >
-                            <p class="mb-3 mt-3">
+                            <p class="mb-3 mt-3 text-center">
                                 @if(is_numeric($history_order->order_total))
                                     {{ number_format($history_order->order_total, 0, ',', '.') }}đ
                                 @else
-                                    {{ $history_order->order_total }} <!-- Hoặc xử lý khác nếu cần -->
+                                    {{ number_format($history_order->order_total, 0, ',', '.') }}đ
                                 @endif
                             </p>
                         </td>
                         <td class=" p-0" >
-                            <a class="btn btn-primary" href="{{URL::to('/order-detail/' . $history_order -> order_id)}}">Chi tiết</a>
+                            <a class="btn btn-primary" style="width: 100%;" href="{{URL::to('/order-detail/' . $history_order -> order_id)}}">Chi tiết</a>
                             @if ($history_order -> order_status=='Đã huỷ' || $history_order -> order_status=='Đã nhận hàng' ||$history_order -> order_status=='Đặt thành công, Đang giao hàng')
                                 
                             @else

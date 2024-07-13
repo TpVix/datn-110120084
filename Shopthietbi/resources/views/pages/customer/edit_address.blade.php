@@ -7,8 +7,7 @@
         <h4 class="title mb-3">Chỉnh sửa địa chỉ</h4>
         @foreach ($edit_address as $key => $edit_address)
         <form>
-            {{ csrf_field() }}
-
+            @csrf
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">

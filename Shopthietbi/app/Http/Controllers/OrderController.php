@@ -61,7 +61,6 @@ class OrderController extends Controller
     }
     
     public function print_order_convert($checkout_code){
-        // Truy vấn chi tiết đơn hàng
         $order_detail = DB::table('tbl_order')
             ->join('tbl_customers', 'tbl_order.customer_id', '=', 'tbl_customers.customer_id')
             ->join('tbl_shipping', 'tbl_order.shipping_id', '=', 'tbl_shipping.shipping_id')
@@ -141,11 +140,9 @@ class OrderController extends Controller
             <tr>
             <td>Thành tiền:</td>';
     
-            if ($order_detail->payment_status == "Đã thanh toán") {
-                $output .= '<td><center><b>0đ</b></center></td>';
-            } else {
+           
                 $output .= '<td><center><b>' . number_format($order_detail->order_total, 0, ',', '.') . 'đ</b></center></td>';
-            }
+           
         
             $output .= '
                 </tr>

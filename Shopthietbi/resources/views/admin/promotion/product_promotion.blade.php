@@ -6,7 +6,7 @@
            
         </div>
         <div class="row">
-            <div class="col-xl-8 col-lg-12">
+            <div class="col-xl-7 col-lg-12">
                 <div class="ec-cat-list card card-default mb-24px">
                     <div class="card-body">
                         <?php
@@ -17,10 +17,15 @@
                             }
                             ?>
                         <div class="table-responsive ">
+                            <span style="margin: auto;"><input id="select_all_ids" type="checkbox"/> tất cả</span>
+                            <a href="#" class="btn btn-outline-success" id="chose_all_promotion" ui-toggle-class="">
+                                Chọn <i class="fa fa-pencil-square-o text-success text-active"></i>
+                             </a>
                             <table id="" class="table table_data"
                               style="width:100%">
                               <thead>
                                 <tr>
+                                  <th></th>
                                   <th>Hình ảnh</th>
                                   <th>Tên sản phẩm</th>
                           
@@ -29,13 +34,18 @@
                                   <th>Tên danh mục</th>
                                   <th>Tên thương hiệu</th>
                                  
-                                  <th>Hành động</th>
+                                  
                                 </tr>
                               </thead>
                 
                               <tbody>
+                                @php
+                                $product_ids_with_promotion = $promotion_ids->pluck('product_id')->toArray();
+                                @endphp
                                 @foreach ($all_product as $key => $product)
+                                @if (!in_array($product->product_id, $product_ids_with_promotion))
                                 <tr>
+                                    <td><input type="checkbox" name="ids" class="checkbox_ids" value="{{$product ->product_id}}"></td>
                                   <td><img src="{{ url('public/upload/' . $product->product_image) }}" height="100" width="100" alt=""></td>
                               <td>{{ $product -> product_name}}</td>
                           
@@ -45,18 +55,10 @@
                               <td>{{ $product -> brand_name}}</td>
                               
                 
-                              <td
-                              
-                              >
-                                <a href="{{URL::to('/chose-product/'.$product->product_id)}}" class="btn btn-outline-success" ui-toggle-class="">
-                                   Chọn <i class="fa fa-pencil-square-o text-success text-active"></i>
-                                </a>
-                               
-                              </td>
                                 </tr>
                 
                 
-                      
+                                @endif
                                 @endforeach
                               </tbody>
                             </table>
@@ -64,7 +66,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xl-4 col-lg-12">
+            <div class="col-xl-5 col-lg-12">
                 <div class="ec-cat-list card card-default">
                     <div class="card-body">
                         <div class="table-responsive">
@@ -75,7 +77,7 @@
                                         <th>Tên</th>
                                         
 
-                                        <th>Action</th>
+                                        <th></th>
                                     </tr>
                                 </thead>
 

@@ -32,24 +32,14 @@
                                     @endphp
                                     @foreach ($customer_all as $all)
                                     @php
-                                    $customer=DB::table('tbl_customers')
-                                    ->join('tbl_order','tbl_order.customer_id','=','tbl_customers.customer_id')
-                                    ->where('tbl_customers.customer_id',$all->customer_id)
-                                    ->get();
-                                    
-                                    foreach ($customer as $key => $v_customer) {
-                                       
                                         
-                                    }
-                                   
+                                        $customer=DB::table('tbl_customers')
+                                        ->where('customer_id',$all->customer_id)
+                                        ->first();
                                     @endphp
                                         <tr>
-
-
-
-                                           
-                                            <td>{{ $v_customer->customer_name }}</td>
-                                            <td>{{ $v_customer->customer_email }}</td>
+                                            <td>{{ $customer->customer_name }}</td>
+                                            <td>{{ $customer->customer_email }}</td>
 
 
                                             <td>
@@ -59,11 +49,13 @@
                                             <td>
                                                 {{number_format($all->total_order_amount) . ' ' . 'VNĐ' }}
                                             </td>
-                                            <td>{{ $v_customer->created_at ? Carbon::parse($v_customer->created_at)->format('d/m/Y') : 'N/A' }}
+                                            <td>{{ $customer->created_at ? Carbon::parse($customer->created_at)->format('d/m/Y') : 'N/A' }}
                                             </td>
                                            
                                         </tr>
+                                       
                                     @endforeach
+                                   
                                 </tbody>
                             </table>
                         </div>

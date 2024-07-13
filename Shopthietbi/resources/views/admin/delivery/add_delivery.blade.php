@@ -49,7 +49,7 @@
                             <div class="form-group row">
                                 <label class="col-12 col-form-label">Phí vận chuyển</label>
                                 <div class="col-12">
-                                    <input type="text" class="form-control shipping_fee_price" id="group_tag" name="group_tag" value="" placeholder="" data-role="tagsinput">
+                                    <input type="text" class="form-control shipping_fee_price" id="group_tag" name="group_tag" value="" placeholder="" data-role="tagsinput" required>
                                 </div>
                             </div>
 

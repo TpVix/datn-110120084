@@ -28,12 +28,13 @@
               <thead>
                 <tr>
                   <th>Hình ảnh</th>
-                  <th>Tên sản phẩm</th>
+                  <th style="width:20%;">Tên sản phẩm</th>
                   <th>Số lượng</th>
                   <th>Giá</th>
                
                   <th>Tên danh mục</th>
                   <th>Tên thương hiệu</th>
+                  <th>Nhân viên</th>
                   <th>Hành động</th>
                 </tr>
               </thead>
@@ -46,9 +47,17 @@
               <td>{{ $product -> product_quantity}}</td>
               <td>{{ $product -> product_price}}</td>
             
-              <td>{{ $product -> category_name}}</td>
+              <td>
+                @if ($product -> category_name == '')
+                    Phụ kiện
+                @else
+                {{ $product -> category_name}}
+                @endif
+                
+              
+              </td>
               <td>{{ $product -> brand_name}}</td>
-             
+              <td>{{ $product -> admin_name}}</td>
               <td style="text-align: center;">
               <div
               style="

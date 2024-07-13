@@ -72,12 +72,12 @@
                                     <label for="text" class="col-12 col-form-label">Thương hiệu khuyến mãi</label>
                                     <div class="col-12">
                                         <select name="brand_name" class="form-select">
-                                            
+                                            <option value="">--Không chọn thương hiệu--</option>
                                             @foreach ($brand as $key => $brand)
                                                 <option value="{{ $brand->brand_name }}" @if($brand->brand_name == $promotion_edit->brand_name) selected @endif>{{ $brand->brand_name }}</option>
                                                
                                             @endforeach
-                                            <option value="">--Chọn thương hiệu--</option>
+                                            
                                         </select>
                                     </div>
                                 </div>
@@ -86,8 +86,8 @@
                                     <label for="text" class="col-12 col-form-label">Thương hiệu khuyến mãi</label>
                                     <div class="col-12">
                                         <select name="brand_name" class="form-select">
-                                            <option value="null">
-                                                --Chọn thương hiệu--</option>
+                                            <option value="">
+                                                --Không chọn thương hiệu--</option>
                                             @foreach ($brand as $key => $brand)
                                                 <option value="{{ $brand->brand_name }}">
                                                     {{ $brand->brand_name }}</option>
@@ -140,6 +140,7 @@
                                     <tr>
                                         <th>Tên</th>
                                         <th>Mô tả</th>
+                                        <th>Thương hiệu</th>
                                         <th>Giá khuyến mãi</th>
                                         <th>Loại</th>
                                         <th>Khuyến mãi</th>
@@ -152,6 +153,13 @@
                                         <tr>
                                             <td>{{ $v_promotion->promotion_name }}</td>
                                             <td>{{ $v_promotion->promotion_des }}</td>
+                                            <td>
+                                                @if ($v_promotion->brand_name == '')
+                                                    Không có
+                                                @else
+                                                    {{ $v_promotion->brand_name }}
+                                                @endif
+                                            </td>
                                             <td>{{ $v_promotion->promotion_price }}</td>
                                             <td>{{ $v_promotion->promotion_option }}</td>
                                             <td>

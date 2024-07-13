@@ -151,8 +151,19 @@
                                 </li>
 
                                 <li>
-                                    DANH MỤC: <strong><a href="{{ URL::to('/danh-muc/' . $detail->category_slug) }}"
-                                            class="product-category">{{ $detail->category_name }}</a></strong>
+                                    DANH MỤC:
+                                    @if ($detail->category_name == [])
+                                        <strong><a class="product-category">
+                                                PHỤ KIỆN
+                                            </a></strong>
+                                    @else
+                                        <strong><a href="{{ URL::to('/danh-muc/' . $detail->category_slug) }}"
+                                                class="product-category">
+                                                {{ $detail->category_name }}
+                                            </a></strong>
+                                    @endif
+
+
                                 </li>
 
                                 <li>
@@ -171,7 +182,7 @@
                                 }
                                 ?>
                                 <label style="opacity: 0.5;">Còn lại: {{ $detail->product_quantity }}</label><br>
-                                <form action="{{ URL::to('/add-cart') }}" method="post">
+                                <form action="{{ URL::to('/add-cart') }}" method="post" style="margin: 0">
                                     @csrf
                                     <div class="product-single-qty">
                                         <input name="cart_product_qty" min="1"
@@ -231,31 +242,11 @@
                                     @endif
 
                                 </form>
-                            </div>
+                                <form action="{{ URL::to('/add-wishlist') }}" id="form-wishlist" method="post"
+                                    style="margin: 0">
+                                    @csrf
 
 
-
-
-                            <!-- End .product-action -->
-
-                            <form action="{{ URL::to('/add-wishlist') }}" id="form-wishlist" method="post">
-                                @csrf
-                                <div class="product-single-share mb-3">
-                                    <label class="sr-only">Chia sẻ:</label>
-
-                                    <div class="social-icons mr-2">
-                                        <a href="#" class="social-icon social-facebook icon-facebook"
-                                            target="_blank" title="Facebook"></a>
-                                        <a href="#" class="social-icon social-twitter icon-twitter" target="_blank"
-                                            title="Twitter"></a>
-                                        <a href="#" class="social-icon social-linkedin fab fa-linkedin-in"
-                                            target="_blank" title="Linkedin"></a>
-                                        <a href="#" class="social-icon social-gplus fab fa-google-plus-g"
-                                            target="_blank" title="Google +"></a>
-                                        <a href="#" class="social-icon social-mail icon-mail-alt" target="_blank"
-                                            title="Mail"></a>
-                                    </div>
-                                    <!-- End .social-icons -->
 
                                     <input type="hidden" name="cart_product_id" value="{{ $detail->product_id }}"
                                         class="cart_product_id_{{ $detail->product_id }}">
@@ -269,10 +260,10 @@
                                                 Wishlist</span></a>
                                     @endif
 
+                                </form>
+                            </div>
 
-                                </div>
-                            </form>
-                            <!-- End .product single-share -->
+
                         </div>
                         <!-- End .product-single-details -->
                     </div>
@@ -282,6 +273,132 @@
                 <!-- End .row -->
             </div>
             <!-- End .product-single-container -->
+            @if ($promotion_accessory != '')
+            <hr style="margin: 1rem 0 1rem 0">
+                <div class="products-section pt-0">
+                    <h2 style="text-align: center;" class="section-title">
+                        {{ $promotion_accessory->promotion_accessory_des }}</h2>
+
+                    <div class="products-slider owl-carousel owl-theme dots-top dots-small">
+                        @foreach ($product_by_product_ids as $key => $v_product_by_product_ids)
+                            <div class="product-default">
+                                <figure>
+                                    <a href="{{ URL::to('/san-pham/' . $v_product_by_product_ids->product_slug) }}">
+                                        <img src="{{ URL::to('/public/upload/' . $v_product_by_product_ids->product_image) }}"
+                                            style="width: 280px; height: 280px;"alt="product">
+                                        <img src="{{ URL::to('/public/upload/' . $v_product_by_product_ids->product_image) }}"
+                                            style="transform: scaleX(-1);width: 280px; height: 280px;"alt="product">
+                                    </a>
+                                    {{-- @if ($v_product_by_product_ids->product_status == '1')
+                                    <div class="label-group">
+                                        <div class="product-label label-hot"> 
+                                            Giảm: {{ round(100 - (($v_product_by_product_ids->product_sale_price / $v_product_by_product_ids->product_price) * 100)) }}%
+                                        </div>
+                                    </div>
+                                @else
+                                @endif --}}
+
+                                </figure>
+                                <div class="product-details">
+
+                                    <h3 class="product-title">
+                                        <a
+                                            href="{{ URL::to('/san-pham/' . $v_product_by_product_ids->product_slug) }}">{{ $v_product_by_product_ids->product_name }}</a>
+                                    </h3>
+
+                                    <!-- End .product-container -->
+                                    @if ($promotion_accessory->promotion_accessory_status == 'Có')
+                                        <div class="price-box">
+
+                                            @if ($promotion_accessory->promotion_accessory_option == '%')
+                                                <del
+                                                    class="old-price">{{ number_format($v_product_by_product_ids->product_price) }}</del><br>
+                                                <span style="color:red;"
+                                                    class="product-price">{{ number_format(($v_product_by_product_ids->product_price * (100 - $promotion_accessory->promotion_accessory_price)) / 100) . ' ' . 'VNĐ' }}</span>
+                                            @elseif($promotion_accessory->promotion_accessory_option == 'VNĐ')
+                                                <del
+                                                    class="old-price">{{ number_format($v_product_by_product_ids->product_price) }}</del><br>
+                                                <span style="color:red;"
+                                                    class="product-price">{{ number_format($v_product_by_product_ids->product_price - $promotion_accessory->promotion_accessory_price) . ' ' . 'VNĐ' }}</span>
+                                            @else
+                                                <del class="old-price"></del><br>
+                                                <span style="color:red;"
+                                                    class="product-price">{{ number_format($v_product_by_product_ids->product_price) . ' ' . 'VNĐ' }}</span>
+                                            @endif
+
+                                        </div>
+                                    @else
+                                        <div class="price-box">
+                                            <del class="old-price"></del><br>
+                                            <span style="color:red;"
+                                                class="product-price">{{ number_format($v_product_by_product_ids->product_price) . ' ' . 'VNĐ' }}</span>
+                                        </div>
+                                    @endif
+                                    <p style="color:#999;font-size: 1.4rem;">Đã bán:
+                                        {{ $v_product_by_product_ids->quantity_sold }}
+                                    </p>
+
+                                    <!-- End .price-box -->
+                                    <div class="product-action">
+
+                                        <form action="{{ URL::to('/add-cart') }}" method="post">
+                                            @csrf
+                                            <input type="hidden" name="cart_product_id"
+                                                value="{{ $v_product_by_product_ids->product_id }}"
+                                                class="cart_product_id_{{ $v_product_by_product_ids->product_id }}">
+                                            <input type="hidden" name="cart_product_name"
+                                                value="{{ $v_product_by_product_ids->product_name }}"
+                                                class="cart_product_name_{{ $v_product_by_product_ids->product_id }}">
+                                            <input type="hidden" name="cart_product_image"
+                                                value="{{ $v_product_by_product_ids->product_image }}"
+                                                class="cart_product_image_{{ $v_product_by_product_ids->product_id }}">
+
+                                            @if ($promotion_accessory->promotion_accessory_status == 'Có')
+                                                @if ($promotion_accessory->promotion_accessory_option == '%')
+                                                    <input type="hidden" name="cart_product_price"
+                                                        value="{{ ($v_product_by_product_ids->product_price * (100 - $promotion_accessory->promotion_accessory_price)) / 100 }}"
+                                                        class="cart_product_price_{{ $v_product_by_product_ids->product_id }}">
+                                                @elseif ($promotion_accessory->promotion_accessory_option == 'VNĐ')
+                                                    <input type="hidden" name="cart_product_price"
+                                                        value="{{ $v_product_by_product_ids->product_price - $promotion_accessory->promotion_accessory_price }}"
+                                                        class="cart_product_price_{{ $v_product_by_product_ids->product_id }}">
+                                                @else
+                                                    <input type="hidden" name="cart_product_price"
+                                                        value="{{ $v_product_by_product_ids->product_price }}"
+                                                        class="cart_product_price_{{ $v_product_by_product_ids->product_id }}">
+                                                @endif
+                                            @else
+                                                <input type="hidden" name="cart_product_price"
+                                                    value="{{ $v_product_by_product_ids->product_price }}"
+                                                    class="cart_product_price_{{ $v_product_by_product_ids->product_id }}">
+                                            @endif
+                                            <input type="hidden" name="cart_product_qty" value="1" class="">
+                                            <?php
+                                            $customer_id = Session::get('customer_id');
+                                            ?>
+                                            @if ($customer_id == null)
+                                                <a href="{{ URL::to('/login-register') }}"
+                                                    class="btn-icon btn-add-cart1 product-type-simple">ĐĂNG NHẬP ĐỂ ĐẶT
+                                                    HÀNG</a>
+                                            @else
+                                                <button type="submit" href="#"
+                                                    class="btn-icon btn-add-cart1 product-type-simple"><i
+                                                        class="icon-shopping-cart"></i><span>THÊM VÀO GIỎ
+                                                        HÀNG</span></button>
+                                            @endif
+
+                                        </form>
+                                    </div>
+                                </div>
+                                <!-- End .product-details -->
+                            </div>
+                        @endforeach
+                    </div>
+
+
+                </div>
+            @else
+            @endif
 
             <div class="product-single-tabs">
                 <ul class="nav nav-tabs" role="tablist">
@@ -307,7 +424,8 @@
                 <div class="tab-content">
                     <div class="tab-pane fade show active" id="product-desc-content" role="tabpanel"
                         aria-labelledby="product-tab-desc">
-                        <div class="product-desc-content" style="background: #f4f4f4; color: black; padding: 1px 20px 1px 20px;">
+                        <div class="product-desc-content"
+                            style="background: #f4f4f4; color: black; padding: 1px 20px 1px 20px;">
                             <p>{!! $detail->product_desc !!}</p>
 
                         </div>
@@ -326,8 +444,8 @@
                                 @foreach ($comment as $v_comment)
                                     <div class="comments mb-2">
                                         <figure class="img-thumbnail">
-                                            <img src="{{asset('public/frontend/assets/images/rating_comment_user.png')}}" alt="author" width="80"
-                                                height="80">
+                                            <img src="{{ asset('public/frontend/assets/images/rating_comment_user.png') }}"
+                                                alt="author" width="80" height="80">
                                         </figure>
 
                                         <div class="comment-block">
@@ -346,7 +464,7 @@
                                             </div>
 
                                             <div class="comment-content">
-                                                <p>{{ $v_comment->comment}}</p>
+                                                <p>{{ $v_comment->comment }}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -396,8 +514,8 @@
                                 @foreach ($rating as $v_rating)
                                     <div class="comments mb-2">
                                         <figure class="img-thumbnail">
-                                            <img src="{{asset('public/frontend/assets/images/rating_comment_user.png')}}" alt="author" width="80"
-                                                height="80">
+                                            <img src="{{ asset('public/frontend/assets/images/rating_comment_user.png') }}"
+                                                alt="author" width="80" height="80">
                                         </figure>
 
                                         <div class="comment-block">
@@ -488,13 +606,17 @@
                                             <a href="{{ url('/login-register') }}" class="btn btn-primary">Đăng nhập để
                                                 đánh giá</a>
                                         @else
-                                           
-                                                @if (Session::get('true') == '2')
-                                                    <input type="submit" class="btn btn-primary" value="Đánh giá">
-                                                @else
-                                                    <label for="">Vui lòng mua hàng để có thể đánh giá</label>
-                                                @endif
-                                            
+                                            @if (Session::get('order_status') == 'rỗng')
+                                                <label for="">Vui lòng mua hàng để có thể đánh giá</label>
+                                            @else
+                                                @foreach ($status_order as $v_status_order)
+                                                    @if ($v_status_order->order_status == 'Đã nhận hàng')
+                                                        <input type="submit" class="btn btn-primary" value="Đánh giá">
+                                                    @else
+                                                        <label for="">Vui lòng mua hàng để có thể đánh giá</label>
+                                                    @endif
+                                                @endforeach
+                                            @endif
                                         @endif
                                     </div>
                                 </form>
@@ -533,9 +655,7 @@
 
                             </figure>
                             <div class="product-details">
-                                <div class="category-list">
-                                    <a href="category.html" class="product-category">Category</a>
-                                </div>
+                               
                                 <h3 class="product-title">
                                     <a
                                         href="{{ URL::to('/san-pham/' . $related_product->product_slug) }}">{{ $related_product->product_name }}</a>
@@ -547,7 +667,7 @@
                                             $mean_related_product = 0;
                                             $total_start_related_product = 0;
                                             $rating = DB::table('tbl_rating')
-                            
+
                                                 ->where('product_id', $related_product->product_id)
                                                 ->orderBy('rating_id', 'desc')
                                                 ->get();

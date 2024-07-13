@@ -71,7 +71,7 @@
                                                 <label>Địa chỉ <span class="required">*</span></label>
                                                 <input name="shipping_address" type="text"
                                                     class="form-control shipping_address" placeholder="Số nhà, tên đường"
-                                                    required />
+                                                     />
                                             </div>
                                         </div>
                                     </div>
@@ -254,7 +254,7 @@
                                                 <label>Địa chỉ <span class="required">*</span></label>
                                                 <input name="shipping_address" type="text"
                                                     class="form-control shipping_address" placeholder="Số nhà, tên đường"
-                                                    required />
+                                                     />
                                             </div>
                                         </div>
                                     </div>

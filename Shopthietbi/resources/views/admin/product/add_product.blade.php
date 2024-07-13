@@ -59,7 +59,7 @@
                                                 <input data-validation="required" class="form-control slug-title"
                                                     data-validation-error-msg="Tên sản phẩm không được để trống"
                                                     type="text" name="product_name" id="exampleInputEmail1"
-                                                    placeholder="Tên sản phẩm">
+                                                    placeholder="Tên sản phẩm" required>
 
                                             </div>
                                             <div class="col-md-6 mb-25">
@@ -67,7 +67,7 @@
                                                 <input type="text" data-validation="number"
                                                     data-validation-error-msg="Số lượng phải là số và không được để trống"
                                                     name="product_quantity" class="form-control" id="exampleInputEmail1"
-                                                    placeholder="Số lượng sản phẩm">
+                                                    placeholder="Số lượng sản phẩm" required>
 
                                             </div>
                                             <div class="col-md-12 mb-25 text-center">
@@ -126,7 +126,7 @@
                                                 <input type="text" data-validation="number"
                                                     data-validation-error-msg="Giá phải là số và không được để trống"
                                                     name="product_price" class="form-control" id="exampleInputEmail1"
-                                                    placeholder="Giá sản phẩm">
+                                                    placeholder="Giá sản phẩm" required>
 
                                             </div>
                                             <div class="col-md-12 mb-25">
@@ -136,13 +136,13 @@
                                                         data-validation-error-msg="Đường dẫn không được để trống"
                                                         type="text" name="product_slug"
                                                         class="form-control here set-slug" id="exampleInputEmail1"
-                                                        placeholder="Đường dẫn sản phẩm">
+                                                        placeholder="Đường dẫn sản phẩm" required>
 
                                                 </div>
                                             </div>
                                             <div class="col-md-12 mb-25">
                                                 <label class="form-label">Mô tả</label>
-                                                <textarea class="form-control" rows="4" name="product_desc" id="editor1" placeholder="Mô tả"></textarea>
+                                                <textarea class="form-control" rows="4" name="product_desc" id="editor1" placeholder="Mô tả" required></textarea>
 
                                             </div>
                                            

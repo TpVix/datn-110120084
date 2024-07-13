@@ -14,7 +14,7 @@
             <table id="" class="table table_data" style="width:100%">
               <thead>
                 <tr>
-                  
+                  <th>Mã đơn hàng</th>
                   <th>Tên đơn hàng</th>
                   <th>Tên người mua</th>
                   <th>Tổng số lượng</th>
@@ -30,6 +30,7 @@
                 @foreach ($all_order as $key => $all_order)
 
                 <tr>
+                  <td> {{ $all_order -> order_id}}</td>
                   <td> {{ $all_order -> order_name}}</td>
                   <td> {{ $all_order -> shipping_name}}</td>
                   <td> {{ $all_order -> order_quantity}}</td>

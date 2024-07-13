@@ -120,50 +120,28 @@
 
                                         <div class="card-body">
                                             <div class="row ec-vendor-uploads">
-                                                <div class="col-lg-5">
-                                                    <div class="ec-vendor-img-upload">
-                                                        <div class="ec-vendor-main-img">
-                                                            <div class="avatar-upload">
-                                                                <div class="avatar-edit">
-                                                                    <input type='file' id="imageUpload"
-                                                                        name="admin_image" class="ec-image-upload"
-                                                                        accept=".png, .jpg, .jpeg" />
-                                                                    <label for="imageUpload"><img
-                                                                            src="{{ asset('public/backend/assets/img/icons/edit.svg') }}"
-                                                                            class="svg_img header_svg"
-                                                                            alt="edit" /></label>
-                                                                </div>
-                                                                <div class="avatar-preview ec-preview">
-                                                                    <div class="imagePreview ec-div-preview">
-                                                                        <img class="ec-image-preview"
-                                                                            src="{{ asset('public/backend/assets/img/products/vender-upload-preview.jpg') }}"
-                                                                            alt="edit" />
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-7">
-                                                    <div class="ec-vendor-upload-detail">
-
+                                               
+                                                <div class="col-lg-12">
+                                                    <div class="ec-vendor-upload-detail" style="display: flex;justify-content: space-between;">
+                                                        <div class="col-lg-6" style="padding: 10px;">
                                                         <div class="col-md-12">
                                                             <label for="inputEmail4" class="form-label">Tên đăng
                                                                 nhập</label>
                                                             <input type="text" name="admin_name"
-                                                                class="form-control slug-title" id="inputEmail4">
+                                                                class="form-control slug-title" id="inputEmail4" required>
                                                         </div>
                                                         <div class="col-md-12">
                                                             <label for="inputEmail4" class="form-label">Số điện
                                                                 thoại</label>
                                                             <input type="text" name="admin_phone"
-                                                                class="form-control slug-title" id="inputEmail4">
+                                                                class="form-control slug-title" id="inputEmail4" required>
                                                         </div>
+                                                    </div>
+                                                    <div class="col-lg-6" style="padding: 10px;">
                                                         <div class="col-md-12">
                                                             <label for="inputEmail4" class="form-label">Mật khẩu</label>
                                                             <input type="password" name="admin_password"
-                                                                class="form-control slug-title" id="inputEmail4">
+                                                                class="form-control slug-title" id="inputEmail4" required>
                                                         </div>
                                                         <div class="col-md-12">
                                                             <label for="inputEmail4" class="form-label">Quyền</label>
@@ -175,10 +153,11 @@
 
                                                             </select>
                                                         </div>
-                                                        <div class="col-md-12 mt-1 text-right">
-                                                            <button type="submit" class="btn btn-primary">Tạo</button>
-                                                        </div>
-
+                                                    
+                                                </div>
+                                                </div>
+                                                    <div class="col-md-12 mt-1 text-right">
+                                                        <button type="submit" class="btn btn-primary">Tạo</button>
                                                     </div>
                                                 </div>
                                             </div>

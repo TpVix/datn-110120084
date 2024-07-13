@@ -23,41 +23,41 @@
                     @php
                         $total=0;
                     @endphp
-                    @foreach ($order_detail as $key =>$order_detail )
+                    @foreach ($order_detail as $key =>$v_order_detail )
                     <?php
                     $message = Session::get('message');
                     if ($message) {
                         echo "<div class='alert alert-success'>$message</div>";
                         Session::put('message', null);
                     }
-                    $product = DB::table('tbl_product') -> where('tbl_product.product_id', $order_detail->product_id)->get();
+                    $product = DB::table('tbl_product') -> where('tbl_product.product_id', $v_order_detail->product_id)->get();
 					foreach ($product as $slug => $pro_slug) {
 						    Session::put('product_slug',$pro_slug->product_slug);
 						    $product_slug=Session::get('product_slug');
 						}
-					$subtotal = $order_detail-> product_price*$order_detail-> product_quantity;
+					$subtotal = $v_order_detail-> product_price*$v_order_detail-> product_quantity;
 					$total += $subtotal;
                     ?>
                     
                     <tr>
                         <td class=" p-0" >
                             <a href="{{URL::to('/san-pham/'.$product_slug)}}" style="padding: 1.3rem 1rem;">
-                               <img style="height: 100px;" src="{{asset('public/upload/'.$order_detail-> product_image)}}" alt="">  
+                               <img style="height: 100px;" src="{{asset('public/upload/'.$v_order_detail-> product_image)}}" alt="">  
                             </a>
                         </td>
                         <td class=" p-0" >
                             <a href="{{URL::to('/san-pham/'.$product_slug)}}" style="padding: 1.3rem 1rem; color: #777;">
-                                {{($order_detail -> product_name)}}
+                                {{($v_order_detail -> product_name)}}
                             </a>
                         </td>
                         <td class=" p-0" >
                             <p style="padding: 1.3rem 1rem;">
-                                {{($order_detail -> product_quantity)}}
+                                {{($v_order_detail -> product_quantity)}}
                             </p>
                         </td>
                         <td class=" p-0" >
                             <p style="padding: 1.3rem 1rem;">
-                                {{($order_detail -> product_price)}}
+                                {{($v_order_detail -> product_price)}}
                             </p>
                         </td>
                         <td class=" p-0" >
@@ -103,18 +103,32 @@
 						</tfoot>
 														
 					</table>
-                    @if ($history_order -> order_status=='Đã huỷ' || $history_order -> order_status=='Đã nhận hàng' ||$history_order -> order_status=='Đặt thành công, Đang giao hàng')
+                    @if ($history_order -> order_status=='Đang chờ xử lý')
+                    <div class="checkout-methods d-flex">
+                        <div class="col-lg-12">
+                            <a onclick="return confirm('Bạn có chắc muốn huỷ đơn hàng ?')" href="{{URL::to('/cancel-order/'.$history_order -> order_id)}}"class="btn btn-block btn-danger col-lg-12"><i class="fa fa-times "></i> Huỷ đơn</a>
+                        </div>
+                    </div>
+                    @elseif($history_order -> order_status=='Đặt thành công, Đang giao hàng')
+                    <div class="checkout-methods d-flex">
+                        <div class="col-lg-12">
+                            <a onclick="return confirm('Bạn có chắc muốn xác nhận đã nhận hàng, sau khi xác nhận không thể hoàn tác !')" href="{{URL::to('/checked-order/'.$history_order -> order_id)}}"class="btn btn-block btn-primary col-lg-12"><i class="fa fa-check"></i> Đã nhận</a>
+                        </div>
+                    </div>
+                    @elseif($history_order -> order_status=='Đã huỷ')
+                    @endif
+                    {{-- @if ($history_order -> order_status=='Đã huỷ' || $history_order -> order_status=='Đã nhận hàng' ||$history_order -> order_status=='Đặt thành công, Đang giao hàng')
                                 
                     @else
 					<div class="checkout-methods d-flex">
-                    <div class="col-lg-6">
-                        <a onclick="return confirm('Bạn có chắc muốn xác nhận đã nhận hàng, sau khi xác nhận không thể hoàn tác !')" href="{{URL::to('/checked-order/'.$history_order -> order_id)}}"class="btn btn-block btn-primary col-lg-12"><i class="fa fa-check"></i> Đã nhận</a>
+                        <div class="col-lg-6">
+                            <a onclick="return confirm('Bạn có chắc muốn xác nhận đã nhận hàng, sau khi xác nhận không thể hoàn tác !')" href="{{URL::to('/checked-order/'.$history_order -> order_id)}}"class="btn btn-block btn-primary col-lg-12"><i class="fa fa-check"></i> Đã nhận</a>
+                        </div>
+                        <div class="col-lg-6">
+                            <a onclick="return confirm('Bạn có chắc muốn huỷ đơn hàng ?')" href="{{URL::to('/cancel-order/'.$history_order -> order_id)}}"class="btn btn-block btn-danger col-lg-12"><i class="fa fa-times "></i> Huỷ đơn</a>
+                        </div>
                     </div>
-                    <div class="col-lg-6">
-                        <a onclick="return confirm('Bạn có chắc muốn huỷ đơn hàng ?')" href="{{URL::to('/cancel-order/'.$history_order -> order_id)}}"class="btn btn-block btn-danger col-lg-12"><i class="fa fa-times "></i> Huỷ đơn</a>
-					</div>
-                    </div>
-                    @endif
+                    @endif --}}
                 </div><!-- End .cart-summary -->
 			</div>
             <div class="col-lg-6 float-left">

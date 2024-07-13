@@ -33,6 +33,7 @@ class ProductController extends Controller
         $all_product = DB::table('tbl_product')
         ->leftJoin('tbl_category_product', 'tbl_category_product.category_id', '=', 'tbl_product.category_id')
         ->leftJoin('tbl_brand', 'tbl_brand.brand_id', '=', 'tbl_product.brand_id')
+        ->leftJoin('tbl_admin', 'tbl_admin.admin_id', '=', 'tbl_product.admin_id')
         ->orderBy('product_id','desc')->get();
         $manager_product = view('admin.product.list_product') -> with('all_product', $all_product);
         return view('admin_layout')->with('admin.list_product', $manager_product);
@@ -47,7 +48,10 @@ class ProductController extends Controller
         $data['product_desc'] = $request -> product_desc;
         $data['category_id'] = $request -> category_id;
         $data['brand_id'] = $request -> brand_id;
-
+        $data['admin_id'] = Session::get('admin_id');
+        $request->validate([
+            'product_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
         $get_image = $request -> file('product_image');
         if($get_image){
             $get_name = $get_image -> getClientOriginalName();
@@ -73,7 +77,7 @@ class ProductController extends Controller
         $category = Category::orderBy('category_id','desc') -> get();
         $brand =Brand::orderBy('brand_id','desc') -> get();
 
-        $product_image=DB::table('tbl_product_image')->where('product_id', Session::get('product_id'))->get();
+        $product_image=DB::table('tbl_product_image')->where('product_id', $product_id)->get();
         $edit_product=DB::table('tbl_product')->where('product_id', $product_id)->get();
 
         return view('admin.product.edit_product')
@@ -92,6 +96,7 @@ class ProductController extends Controller
         $data['product_desc'] = $request -> product_desc;
         $data['category_id'] = $request -> category_id;
         $data['brand_id'] = $request -> brand_id;
+        $data['admin_id'] = Session::get('admin_id');
         $get_image = $request -> file('product_image');
         if($get_image){
             $get_name = $get_image -> getClientOriginalName();
@@ -138,6 +143,7 @@ class ProductController extends Controller
         -> with('product_image', $product_image);
     }
     public function save_image(Request $request){
+        $this -> AuthLogin();
         $get_image = $request -> file('product_image');
         if($get_image){
             $get_name = $get_image -> getClientOriginalName();
@@ -159,6 +165,7 @@ class ProductController extends Controller
         }
     }
     public function update_image($image_id,Request $request){
+        $this -> AuthLogin();
         $get_image = $request -> file('product_image');
         if($get_image){
             $get_name = $get_image -> getClientOriginalName();

@@ -81,7 +81,6 @@ class CheckoutController extends Controller
     public function save_checkout(Request $request)
     {
 
-        //save shipping customer
         $data_shipping = array();
         $data_shipping['shipping_name'] = $request->shipping_name;
         $data_shipping['shipping_address'] = $request->shipping_address . ', ' . $request->ward . ', ' . $request->district . ', ' . $request->city;
@@ -90,7 +89,6 @@ class CheckoutController extends Controller
         $data_shipping['customer_id'] = Session::get('customer_id');
         $shipping_id = DB::table('tbl_shipping')->insertGetId($data_shipping);
         Session::put('shipping_id', $shipping_id);
-        //get payment method
         $data_payment = array();
         $data_payment['payment_method'] = $request->payment_option;
         $data_payment['payment_status'] = 'Thanh toán khi nhận hàng';
@@ -98,24 +96,19 @@ class CheckoutController extends Controller
         $payment_id = DB::table('tbl_payment')->insertGetId($data_payment);
         $order_quantity = 0;
 
-        // Lấy tất cả các chi tiết giỏ hàng của khách hàng
         $value_order_cart_detail = DB::table('tbl_cart_detail')
             ->where('customer_id', Session::get('customer_id'))
             ->get();
 
         foreach ($value_order_cart_detail as $v_order) {
-            // Cộng dồn số lượng sản phẩm từ giỏ hàng
             $order_quantity += $v_order->product_quantity;
 
-            // Lấy số lượng sản phẩm hiện tại từ bảng sản phẩm
             $qty_old = DB::table('tbl_product')
                 ->where('product_id', $v_order->product_id)
                 ->first();
 
             if ($qty_old) {
-                // Tính số lượng sản phẩm mới sau khi trừ đi số lượng đã đặt
                 $new_qty = $qty_old->product_quantity - $v_order->product_quantity;
-                // Cập nhật số lượng sản phẩm mới vào bảng sản phẩm
                 DB::table('tbl_product')
                     ->where('product_id', $qty_old->product_id)
                     ->update(['product_quantity' => $new_qty]);
@@ -123,7 +116,6 @@ class CheckoutController extends Controller
         }
 
 
-        // insert order
         $data_order = array();
         $data_order['customer_id'] = Session::get('customer_id');
         $data_order['shipping_id'] = $shipping_id;
@@ -134,7 +126,6 @@ class CheckoutController extends Controller
         $data_order['shipping_fee'] = Session::get('shipping_fee');
         $data_order['order_status'] = 'Đang chờ xử lý';
         $order_id = DB::table('tbl_order')->insertGetId($data_order);
-        //insert order detail'
         $cart_detail = DB::table('tbl_cart_detail')->where('customer_id', Session::get('customer_id'))->get();
         $total_cart = 0;
         foreach ($cart_detail as $key => $v_cart_detail) {
@@ -167,6 +158,7 @@ class CheckoutController extends Controller
     }
     public function send_mail()
     {
+        Session::put('total_cart', 0);
         $customer_name = Session::get('customer_name');
         $order_name = DB::table('tbl_order')->where('order_id', Session::get('order_id'))->first();
         $content = DB::table('tbl_order_detail')->where('order_id', Session::get('order_id'))->get();
@@ -186,10 +178,9 @@ class CheckoutController extends Controller
             $customer_email = Session::get('customer_email');
             $message->to($customer_email, 'Shop thiết bị')
                 ->subject('Mail mua hàng thành công');
-            // Đính kèm dữ liệu
         });
 
-        return redirect('succes'); // Sử dụng hàm redirect thay vì Redirect::to()
+        return redirect('succes'); 
     }
     public function vnpay_payment(Request $request)
     {

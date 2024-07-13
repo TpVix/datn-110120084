@@ -244,13 +244,32 @@
 							</div>
 							
 						</li>
-						<li class="active">
-							<a class="sidenav-item-link" href="{{url('/add-promotion')}}">
+						{{-- <li class="active">
+							<a class="sidenav-item-link" >
 								<i class="mdi mdi-tag-minus"></i>
 								<span class="nav-text">Khuyến mãi</span>
 							</a>
+						</li> --}}
+						<li class="has-sub active">
+							<a class="sidenav-item-link" href="javascript:void(0)">
+								<i class="mdi mdi-tag-minus"></i>
+								<span class="nav-text">Khuyến mãi</span> <b class="caret"></b>
+							</a>
+							<div class="collapse">
+								<ul class="sub-menu" id="categorys" data-parent="#sidebar-menu">
+									<li class="">
+										<a class="sidenav-item-link" href="{{url('/add-promotion')}}">
+											<span class="nav-text">Sản phẩm khuyến mãi</span>
+										</a>
+									</li>
+									<li class="">
+										<a class="sidenav-item-link" href="{{url('/add-promotion-accessory')}}">
+											<span class="nav-text">Phụ kiện khuyến mãi</span>
+										</a>
+									</li>
+								</ul>
+							</div>
 						</li>
-
 						
                         
 						
@@ -365,6 +384,114 @@
     <script src="{{asset('public/backend/ckeditor/ckeditor.js')}}"></script>
 	<script src="{{asset('public/frontend/assets/js/sweetalert.js')}}"></script>
 	<script src="{{asset('public/backend/assets/js/datatable.js')}}"></script>
+	<script>
+		$(function(e){
+			$("#select_all_ids").click(function () {
+				$('.checkbox_ids').prop('checked', $(this).prop('checked'));
+			});
+
+			$('#chose_all').click(function (e) {
+				e.preventDefault();
+				var all_ids=[];
+				$('input:checkbox[name=ids]:checked').each(function(){
+					all_ids.push($(this).val());
+				})
+				$.ajax({
+					url:'{{url('/chose-promotion-accessory-product')}}',
+					type:'POST',
+					data:{
+						ids:all_ids,
+						_token:'{{csrf_token()}}'
+					},
+					success: function(data){
+						location.reload();
+						},
+						
+					})
+				})
+		});
+	</script>
+	<script>
+		$(function(e){
+			$("#select_all_ids").click(function () {
+				$('.checkbox_ids').prop('checked', $(this).prop('checked'));
+			});
+
+			$('#chose_all_promotion').click(function (e) {
+				e.preventDefault();
+				var all_ids=[];
+				$('input:checkbox[name=ids]:checked').each(function(){
+					all_ids.push($(this).val());
+				})
+				$.ajax({
+					url:'{{url('/chose-product')}}',
+					type:'POST',
+					data:{
+						ids:all_ids,
+						_token:'{{csrf_token()}}'
+					},
+					success: function(data){
+						location.reload();
+						},
+						
+					})
+				})
+		});
+	</script>
+	<script>
+		$(function(e){
+			$("#select_all_ids").click(function () {
+				$('.checkbox_ids').prop('checked', $(this).prop('checked'));
+			});
+
+			$('#chose_all_accessory').click(function (e) {
+				e.preventDefault();
+				var all_ids=[];
+				$('input:checkbox[name=ids]:checked').each(function(){
+					all_ids.push($(this).val());
+				})
+				$.ajax({
+					url:'{{url('/chose-product-accessory')}}',
+					type:'POST',
+					data:{
+						ids:all_ids,
+						_token:'{{csrf_token()}}'
+					},
+					success: function(data){
+						location.reload();
+						},
+						
+					})
+				})
+		});
+	</script>
+	<script>
+		$(function(e){
+			$("#select_all_ids").click(function () {
+				$('.checkbox_ids').prop('checked', $(this).prop('checked'));
+			});
+
+			$('#chose_all_promotion_accessory').click(function (e) {
+				e.preventDefault();
+				var all_ids=[];
+				$('input:checkbox[name=ids]:checked').each(function(){
+					all_ids.push($(this).val());
+				})
+				$.ajax({
+					url:'{{url('/chose-promotion-accessory-product')}}',
+					type:'POST',
+					data:{
+						ids:all_ids,
+						_token:'{{csrf_token()}}'
+					},
+					success: function(data){
+						location.reload();
+						},
+						
+					})
+				})
+		});
+	</script>
 	<script>
         document.addEventListener('DOMContentLoaded', function() {
             const brand_checkbox = document.querySelectorAll('input[name="brand_checkbox"]');
