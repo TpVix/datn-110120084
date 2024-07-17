@@ -197,15 +197,31 @@
 											@endphp
 											@foreach ($cart_detail as $key => $cart)
 											@php
-											
-											$product = DB::table('tbl_product') -> where('tbl_product.product_id', $cart->product_id)->get();
-											foreach ($product as $slug => $pro_slug) {
-												Session::put('product_slug',$pro_slug->product_slug);
-			
-												$product_slug=Session::get('product_slug');
-											}
-											$subtotal = $cart-> product_price*$cart-> product_quantity;
-											$total += $subtotal;
+											if ($cart->product_quantity!=0) {
+                                            $product = DB::table('tbl_product')
+                                                ->where('tbl_product.product_id', $cart->product_id)
+                                                ->get();
+                                            foreach ($product as $slug => $pro_slug) {
+                                                Session::put('product_slug', $pro_slug->product_slug);
+
+                                                $product_slug = Session::get('product_slug');
+   
+                                            }
+                                            $subtotal = $cart->product_price * $cart->product_cart_quantity;
+                                            $total += $subtotal;
+                                        }else {
+                                            $product = DB::table('tbl_product')
+                                                ->where('tbl_product.product_id', $cart->product_id)
+                                                ->get();
+                                            foreach ($product as $slug => $pro_slug) {
+                                                Session::put('product_slug', $pro_slug->product_slug);
+
+                                                $product_slug = Session::get('product_slug');
+   
+                                            }
+                                            $subtotal = 0;
+                                            $total += $subtotal;
+                                        }
 											@endphp
 											<div class="product">
 												<div class="product-details">
@@ -215,9 +231,14 @@
                                                         @endforeach
 														
 													</h4>
-	
+                                                    
 													<span class="cart-product-info">
-														<span class="cart-product-qty">{{$cart-> product_quantity}}</span> × {{number_format($cart-> product_price,0,',','.')}}đ
+                                                        @if ($cart->product_quantity != 0)
+														<span class="cart-product-qty">{{$cart-> product_cart_quantity}}</span> × {{number_format($cart-> product_price,0,',','.')}}đ
+
+                                                        @else
+                                                        Sản phẩm hết hàng
+                                                        @endif
 													</span>
 												</div>
 												<!-- End .product-details -->
@@ -663,7 +684,7 @@
     <script src="{{ asset('public/frontend/assets/js/map.js') }}"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCgE-0rcnwd-H2jkwj9svQ_ogC_Rztr5GQ"></script>
 
-
+    <script src="https://messenger.svc.chative.io/static/v1.0/channels/s6fcf1187-9a3d-4de0-b6ba-9cd342cce148/messenger.js?mode=livechat" defer="defer"></script>
     <!-- Main JS File -->
     <script src="{{asset('public/frontend/assets/js/main.min.js')}}"></script>
     <!-- This site is converting visitors into subscribers and customers with https://respond.io -->

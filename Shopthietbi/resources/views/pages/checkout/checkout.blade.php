@@ -109,15 +109,15 @@
                                     @endphp
                                     @foreach ($cart_detail as $key => $cart1)
                                         @php
-                                            $subtotal = $cart1->product_price * $cart1->product_quantity;
+                                            $subtotal = $cart1->product_price * $cart1->product_cart_quantity;
                                             $total = Session::get('total');
                                         @endphp
-
+                                        @if ($cart1->product_quantity !=0)
                                         <tr>
                                             <td class="product-col">
                                                 <h3 class="product-title">
                                                     {{ $cart1->product_name }} ×
-                                                    <span class="product-qty">{{ $cart1->product_quantity }}</span>
+                                                    <span class="product-qty">{{ $cart1->product_cart_quantity }}</span>
                                                 </h3>
                                             </td>
 
@@ -125,6 +125,11 @@
                                                 <span>{{ number_format($subtotal, 0, ',', '.') }}đ</span>
                                             </td>
                                         </tr>
+                                        @else
+
+
+                                        @endif
+                                        
                                     @endforeach
 
                                 </tbody>
@@ -289,25 +294,36 @@
                                 <tbody>
                                     @php
                                         $total2 = 0;
+                                        
                                     @endphp
                                     @foreach ($cart_detail as $key => $cart2)
                                         @php
-                                            $subtotal2 = $cart2->product_price * $cart2->product_quantity;
-                                            $total2 = Session::get('total');
+                                        if ($cart2->product_quantity != 0) {
+                                            $subtotal2 = $cart2->product_price * $cart2->product_cart_quantity;
+                                            
+                                        }else{
+                                            $subtotal2 = 0;
+                                        }
+                                       
+                                        $total2 = Session::get('total');
                                         @endphp
-
+                                        @if ($cart2->product_quantity)
                                         <tr>
                                             <td class="product-col">
                                                 <h3 class="product-title">
                                                     {{ $cart2->product_name }} ×
-                                                    <span class="product-qty">{{ $cart2->product_quantity }}</span>
+                                                    <span class="product-qty">{{ $cart2->product_cart_quantity }}</span>
                                                 </h3>
                                             </td>
 
                                             <td class="price-col">
                                                 <span>{{ number_format($subtotal2, 0, ',', '.') }}đ</span>
                                             </td>
-                                        </tr>
+                                        </tr> 
+                                        @else
+                                            
+                                        @endif
+                                        
                                     @endforeach
 
                                 </tbody>

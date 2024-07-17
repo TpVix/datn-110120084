@@ -207,17 +207,31 @@
                                         @endphp
                                         @foreach ($cart_detail as $key => $cart)
                                             @php
+                                        if ($cart->product_quantity!=0) {
+                                            $product = DB::table('tbl_product')
+                                                ->where('tbl_product.product_id', $cart->product_id)
+                                                ->get();
+                                            foreach ($product as $slug => $pro_slug) {
+                                                Session::put('product_slug', $pro_slug->product_slug);
 
-                                                $product = DB::table('tbl_product')
-                                                    ->where('tbl_product.product_id', $cart->product_id)
-                                                    ->get();
-                                                foreach ($product as $slug => $pro_slug) {
-                                                    Session::put('product_slug', $pro_slug->product_slug);
+                                                $product_slug = Session::get('product_slug');
+   
+                                            }
+                                            $subtotal = $cart->product_price * $cart->product_cart_quantity;
+                                            $total += $subtotal;
+                                        }else {
+                                            $product = DB::table('tbl_product')
+                                                ->where('tbl_product.product_id', $cart->product_id)
+                                                ->get();
+                                            foreach ($product as $slug => $pro_slug) {
+                                                Session::put('product_slug', $pro_slug->product_slug);
 
-                                                    $product_slug = Session::get('product_slug');
-                                                }
-                                                $subtotal = $cart->product_price * $cart->product_quantity;
-                                                $total += $subtotal;
+                                                $product_slug = Session::get('product_slug');
+   
+                                            }
+                                            $subtotal = 0;
+                                            $total += $subtotal;
+                                        }
                                             @endphp
                                             <div class="product">
                                                 <div class="product-details">
@@ -227,10 +241,12 @@
                                                     </h4>
 
                                                     <span class="cart-product-info">
-                                                        <span
-                                                            class="cart-product-qty">{{ $cart->product_quantity }}</span>
-                                                        × {{ number_format($cart->product_price, 0, ',', '.') }}đ
-                                                    </span>
+                                                        @if ($cart->product_quantity != 0)
+														<span class="cart-product-qty">{{$cart-> product_cart_quantity}}</span> × {{number_format($cart-> product_price,0,',','.')}}đ
+
+                                                        @else
+                                                        Sản phẩm hết hàng
+                                                        @endif
                                                 </div>
                                                 <!-- End .product-details -->
 
@@ -751,6 +767,7 @@
     <script src="{{ asset('public/frontend/assets/js/jquery.appear.min.js') }}"></script>
     <script src="{{ asset('public/frontend/assets/js/sweetalert.js') }}"></script>
     {{-- <script src="{{ asset('public/frontend/assets/js/map.js') }}"></script> --}}
+    <script src="https://messenger.svc.chative.io/static/v1.0/channels/s6fcf1187-9a3d-4de0-b6ba-9cd342cce148/messenger.js?mode=livechat" defer="defer"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCgE-0rcnwd-H2jkwj9svQ_ogC_Rztr5GQ"></script>
 	<script src="{{asset('public/backend/assets/js/datatable.js')}}"></script>
 

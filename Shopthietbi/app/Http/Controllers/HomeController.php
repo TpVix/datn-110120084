@@ -17,18 +17,35 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $seven_days_ago = Carbon::now()->subDays(7);
+        $all_product = DB::table('tbl_product')
+        ->join('tbl_cart_detail','tbl_product.product_id','=','tbl_cart_detail.product_id')
+        ->get();
+        foreach ($all_product as $key => $v_all_product) {
+           if ($v_all_product->product_quantity == 0) {
+            DB::table('tbl_cart_detail')->where('product_id',$v_all_product->product_id)
+            ->update(['product_cart_quantity'=>0]);
+           }
+        }
+        
+        $seven_days_ago = Carbon::now()->subDays(10);
 
-        $cart_detail = DB::table('tbl_cart_detail')->where('customer_id', Session::get('customer_id'))->get();
+        $cart_detail = DB::table('tbl_cart_detail')
+        ->join('tbl_product','tbl_product.product_id','=','tbl_cart_detail.product_id')
+        ->where('customer_id', Session::get('customer_id'))->get();
         $total_cart = 0;
         foreach ($cart_detail as $key => $v_cart_detail) {
-            $total_cart += $v_cart_detail->product_quantity;
+            if ($v_cart_detail->product_quantity !=0) {
+                $total_cart += $v_cart_detail->product_cart_quantity;
+            } else {
+                $total_cart = 0;
+            }
         }
         Session::put('total_cart', $total_cart);
         $category = Category::where('category_status', '1')->orderBy('category_slug', 'desc')->get();
         $all_accessory = DB::table('tbl_accessory')->where('accessory_status', 'Hiện')->orderBy('accessory_id', 'desc')->get();
         $brand = Brand::where('brand_status', '1')->orderBy('brand_id', 'desc')->get();
         $new_product = DB::table('tbl_product')
+            ->where('product_quantity','!=',0)
             ->whereBetween('created_at', [$seven_days_ago, Carbon::now()])
             ->get();
 
@@ -83,6 +100,7 @@ class HomeController extends Controller
 
             } else {
                 $RCM_product = DB::table('tbl_product')
+                    ->where('product_quantity','!=',0)
                     ->whereIn('product_id', $product_id_rcm)
                     ->whereNotIn('product_id', $product_ids)
                     ->get()->unique('product_id')->values();
@@ -94,12 +112,13 @@ class HomeController extends Controller
 
         $active_promotion = DB::table('tbl_promotion')->where('promotion_status', 'Có')->get();
 
-        $selling_products = DB::table('tbl_product')
-            ->orderBy('quantity_sold', 'desc')
-            ->where('quantity_sold', '>', 0)
-            ->take(10)
-            ->get();
-
+            $selling_products = DB::table('tbl_product')
+                ->orderByRaw('CAST(quantity_sold AS UNSIGNED) DESC')
+                ->where('product_quantity','!=',0)
+                ->where('quantity_sold', '>', 0)
+                ->take(10)
+                ->get();
+     
         if (isset($RCM_product)) {
             return view('pages.home')
                 ->with('slider_short', $slider_short)
@@ -132,15 +151,16 @@ class HomeController extends Controller
     public function contact_us()
     {
         $category = Category::where('category_status', '1')->orderBy('category_slug', 'desc')->get();
-        $cart_detail = DB::table('tbl_cart_detail')->where('customer_id', Session::get('customer_id'))->get();
+        $cart_detail = DB::table('tbl_cart_detail')
+        ->join('tbl_product','tbl_product.product_id','=','tbl_cart_detail.product_id')
+        ->where('customer_id', Session::get('customer_id'))->get();
         $total_cart = 0;
         foreach ($cart_detail as $key => $v_cart_detail) {
-            $total_cart += $v_cart_detail->product_quantity;
-        }
-        Session::put('total_cart', $total_cart);
-        $total_cart = 0;
-        foreach ($cart_detail as $key => $v_cart_detail) {
-            $total_cart += $v_cart_detail->product_quantity;
+            if ($v_cart_detail->product_quantity !=0) {
+                $total_cart += $v_cart_detail->product_cart_quantity;
+            } else {
+                $total_cart = 0;
+            }
         }
         Session::put('total_cart', $total_cart);
         $all_accessory = DB::table('tbl_accessory')->where('accessory_status', 'Hiện')->orderBy('accessory_id', 'desc')->get();
@@ -160,10 +180,16 @@ class HomeController extends Controller
         Session::put('min_price', $min_price);
         Session::put('max_price', $max_price);
 
-        $cart_detail = DB::table('tbl_cart_detail')->where('customer_id', Session::get('customer_id'))->get();
+        $cart_detail = DB::table('tbl_cart_detail')
+        ->join('tbl_product','tbl_product.product_id','=','tbl_cart_detail.product_id')
+        ->where('customer_id', Session::get('customer_id'))->get();
         $total_cart = 0;
         foreach ($cart_detail as $key => $v_cart_detail) {
-            $total_cart += $v_cart_detail->product_quantity;
+            if ($v_cart_detail->product_quantity !=0) {
+                $total_cart += $v_cart_detail->product_cart_quantity;
+            } else {
+                $total_cart = 0;
+            }
         }
         Session::put('total_cart', $total_cart);
         $category = Category::where('category_status', '1')->orderBy('category_slug', 'desc')->get();
@@ -193,6 +219,7 @@ class HomeController extends Controller
         if (Session::get('low_to_high_cat') != null) {
             $query = DB::table('tbl_product')
                 ->leftjoin('tbl_category_product', 'tbl_product.category_id', '=', 'tbl_category_product.category_id')
+                ->where('product_quantity','!=',0)
                 ->where('tbl_category_product.category_slug', $category_slug);
             $product_by_category = $query->orderBy(DB::raw('CAST(product_price AS DECIMAL(10,2))'), 'asc')->paginate(6);
 
@@ -208,6 +235,7 @@ class HomeController extends Controller
         } elseif (Session::get('high_to_low_cat') != null) {
             $query = DB::table('tbl_product')
                 ->leftjoin('tbl_category_product', 'tbl_product.category_id', '=', 'tbl_category_product.category_id')
+                ->where('product_quantity','!=',0)
                 ->where('tbl_category_product.category_slug', $category_slug);
             $product_by_category = $query->orderBy(DB::raw('CAST(product_price AS DECIMAL(10,2))'), 'desc')->paginate(6);
 
@@ -224,6 +252,7 @@ class HomeController extends Controller
         } else {
             $query = DB::table('tbl_product')
                 ->leftjoin('tbl_category_product', 'tbl_product.category_id', '=', 'tbl_category_product.category_id')
+                ->where('product_quantity','!=',0)
                 ->where('tbl_category_product.category_slug', $category_slug);
             $product_by_category = $query->paginate(6);
 
@@ -253,10 +282,16 @@ class HomeController extends Controller
         Session::put('min_price', $min_price);
         Session::put('max_price', $max_price);
 
-        $cart_detail = DB::table('tbl_cart_detail')->where('customer_id', Session::get('customer_id'))->get();
+        $cart_detail = DB::table('tbl_cart_detail')
+        ->join('tbl_product','tbl_product.product_id','=','tbl_cart_detail.product_id')
+        ->where('customer_id', Session::get('customer_id'))->get();
         $total_cart = 0;
         foreach ($cart_detail as $key => $v_cart_detail) {
-            $total_cart += $v_cart_detail->product_quantity;
+            if ($v_cart_detail->product_quantity !=0) {
+                $total_cart += $v_cart_detail->product_cart_quantity;
+            } else {
+                $total_cart = 0;
+            }
         }
         Session::put('total_cart', $total_cart);
         $category = Category::where('category_status', '1')->orderBy('category_slug', 'desc')->get();
@@ -287,6 +322,7 @@ class HomeController extends Controller
             $query = DB::table('tbl_product')
                 ->Join('tbl_accessory_product', 'tbl_accessory_product.product_id', '=', 'tbl_product.product_id')
                 ->join('tbl_accessory', 'tbl_accessory_product.accessory_id', '=', 'tbl_accessory.accessory_id')
+                ->where('product_quantity','!=',0)
                 ->where('tbl_accessory.accessory_slug', $accessory_slug);
             $product_by_accessory = $query->orderBy(DB::raw('CAST(product_price AS DECIMAL(10,2))'), 'asc')->paginate(6);
 
@@ -303,6 +339,7 @@ class HomeController extends Controller
             $query = DB::table('tbl_product')
                 ->Join('tbl_accessory_product', 'tbl_accessory_product.product_id', '=', 'tbl_product.product_id')
                 ->join('tbl_accessory', 'tbl_accessory_product.accessory_id', '=', 'tbl_accessory.accessory_id')
+                ->where('product_quantity','!=',0)
                 ->where('tbl_accessory.accessory_slug', $accessory_slug);
             $product_by_accessory = $query->orderBy(DB::raw('CAST(product_price AS DECIMAL(10,2))'), 'desc')->paginate(6);
 
@@ -319,6 +356,7 @@ class HomeController extends Controller
             $query = DB::table('tbl_product')
                 ->Join('tbl_accessory_product', 'tbl_accessory_product.product_id', '=', 'tbl_product.product_id')
                 ->join('tbl_accessory', 'tbl_accessory_product.accessory_id', '=', 'tbl_accessory.accessory_id')
+                ->where('product_quantity','!=',0)
                 ->where('tbl_accessory.accessory_slug', $accessory_slug);
             $product_by_accessory = $query->paginate(6);
 
@@ -345,10 +383,16 @@ class HomeController extends Controller
         $max_price = DB::table('tbl_product')->max(DB::raw('CAST(product_price AS UNSIGNED)')) + 100000;
         Session::put('min_price', $min_price);
         Session::put('max_price', $max_price);
-        $cart_detail = DB::table('tbl_cart_detail')->where('customer_id', Session::get('customer_id'))->get();
+        $cart_detail = DB::table('tbl_cart_detail')
+        ->join('tbl_product','tbl_product.product_id','=','tbl_cart_detail.product_id')
+        ->where('customer_id', Session::get('customer_id'))->get();
         $total_cart = 0;
         foreach ($cart_detail as $key => $v_cart_detail) {
-            $total_cart += $v_cart_detail->product_quantity;
+            if ($v_cart_detail->product_quantity !=0) {
+                $total_cart += $v_cart_detail->product_cart_quantity;
+            } else {
+                $total_cart = 0;
+            }
         }
         Session::put('total_cart', $total_cart);
         $category = Category::where('category_status', '1')->orderBy('category_slug', 'desc')->get();
@@ -380,6 +424,7 @@ class HomeController extends Controller
         if (Session::get('low_to_high') != null) {
             $query = DB::table('tbl_product')
                 ->join('tbl_brand', 'tbl_product.brand_id', '=', 'tbl_brand.brand_id')
+                ->where('product_quantity','!=',0)
                 ->where('tbl_brand.brand_slug', $brand_slug);
             $product_by_brand = $query->orderBy(DB::raw('CAST(product_price AS DECIMAL(10,2))'), 'asc')->paginate(6);
 
@@ -392,6 +437,7 @@ class HomeController extends Controller
         } elseif (Session::get('high_to_low') != null) {
             $query = DB::table('tbl_product')
                 ->join('tbl_brand', 'tbl_product.brand_id', '=', 'tbl_brand.brand_id')
+                ->where('product_quantity','!=',0)
                 ->where('tbl_brand.brand_slug', $brand_slug);
             $product_by_brand = $query->orderBy(DB::raw('CAST(product_price AS DECIMAL(10,2))'), 'desc')->paginate(6);
 
@@ -404,6 +450,7 @@ class HomeController extends Controller
         } else {
             $query = DB::table('tbl_product')
                 ->join('tbl_brand', 'tbl_product.brand_id', '=', 'tbl_brand.brand_id')
+                ->where('product_quantity','!=',0)
                 ->where('tbl_brand.brand_slug', $brand_slug);
             $product_by_brand = $query->paginate(6);
 
@@ -419,10 +466,16 @@ class HomeController extends Controller
     }
     public function product_detail(Request $request, $product_slug)
     {
-        $cart_detail = DB::table('tbl_cart_detail')->where('customer_id', Session::get('customer_id'))->get();
+        $cart_detail = DB::table('tbl_cart_detail')
+        ->join('tbl_product','tbl_product.product_id','=','tbl_cart_detail.product_id')
+        ->where('customer_id', Session::get('customer_id'))->get();
         $total_cart = 0;
         foreach ($cart_detail as $key => $v_cart_detail) {
-            $total_cart += $v_cart_detail->product_quantity;
+            if ($v_cart_detail->product_quantity !=0) {
+                $total_cart += $v_cart_detail->product_cart_quantity;
+            } else {
+                $total_cart = 0;
+            }
         }
         Session::put('total_cart', $total_cart);
         $category = Category::where('category_status', '1')->orderBy('category_slug', 'desc')->get();
@@ -453,6 +506,7 @@ class HomeController extends Controller
     
             $product_by_product_ids = DB::table('tbl_product')
                 ->whereIn('product_id', $product_ids_by_promotion_accessory)
+                ->where('product_quantity','!=',0)
                 ->get();
             
            
@@ -526,6 +580,7 @@ class HomeController extends Controller
         $related_product = DB::table('tbl_product')
             ->leftjoin('tbl_category_product', 'tbl_category_product.category_id', '=', 'tbl_product.category_id')
             ->join('tbl_brand', 'tbl_brand.brand_id', '=', 'tbl_product.brand_id')
+            ->where('tbl_product.product_quantity','!=',0)
             ->where('tbl_category_product.category_id', $category_id)->whereNotIn('tbl_product.product_slug', [$product_slug])->get();
         $detail = DB::table('tbl_product')->where('product_slug', $product_slug)->first();
         $image_detail = DB::table('tbl_product_image')->where('product_id', $detail->product_id)->get();
@@ -599,10 +654,16 @@ class HomeController extends Controller
     }
     public function my_account($customer_id)
     {
-        $cart_detail = DB::table('tbl_cart_detail')->where('customer_id', Session::get('customer_id'))->get();
+        $cart_detail = DB::table('tbl_cart_detail')
+        ->join('tbl_product','tbl_product.product_id','=','tbl_cart_detail.product_id')
+        ->where('customer_id', Session::get('customer_id'))->get();
         $total_cart = 0;
         foreach ($cart_detail as $key => $v_cart_detail) {
-            $total_cart += $v_cart_detail->product_quantity;
+            if ($v_cart_detail->product_quantity !=0) {
+                $total_cart += $v_cart_detail->product_cart_quantity;
+            } else {
+                $total_cart = 0;
+            }
         }
         Session::put('total_cart', $total_cart);
         $category = Category::where('category_status', '1')->orderBy('category_slug', 'desc')->get();
@@ -640,10 +701,16 @@ class HomeController extends Controller
     public function account_detail($customer_id)
     {
 
-        $cart_detail = DB::table('tbl_cart_detail')->where('customer_id', Session::get('customer_id'))->get();
+        $cart_detail = DB::table('tbl_cart_detail')
+        ->join('tbl_product','tbl_product.product_id','=','tbl_cart_detail.product_id')
+        ->where('customer_id', Session::get('customer_id'))->get();
         $total_cart = 0;
         foreach ($cart_detail as $key => $v_cart_detail) {
-            $total_cart += $v_cart_detail->product_quantity;
+            if ($v_cart_detail->product_quantity !=0) {
+                $total_cart += $v_cart_detail->product_cart_quantity;
+            } else {
+                $total_cart = 0;
+            }
         }
         Session::put('total_cart', $total_cart);
         $category = Category::where('category_status', '1')->orderBy('category_slug', 'desc')->get();
@@ -671,10 +738,16 @@ class HomeController extends Controller
         $max_price = DB::table('tbl_product')->max(DB::raw('CAST(product_price AS UNSIGNED)')) + 100000;
         Session::put('min_price', $min_price);
         Session::put('max_price', $max_price);
-        $cart_detail = DB::table('tbl_cart_detail')->where('customer_id', Session::get('customer_id'))->get();
+        $cart_detail = DB::table('tbl_cart_detail')
+        ->join('tbl_product','tbl_product.product_id','=','tbl_cart_detail.product_id')
+        ->where('customer_id', Session::get('customer_id'))->get();
         $total_cart = 0;
         foreach ($cart_detail as $key => $v_cart_detail) {
-            $total_cart += $v_cart_detail->product_quantity;
+            if ($v_cart_detail->product_quantity !=0) {
+                $total_cart += $v_cart_detail->product_cart_quantity;
+            } else {
+                $total_cart = 0;
+            }
         }
         Session::put('total_cart', $total_cart);
         $category = Category::where('category_status', '1')->orderBy('category_slug', 'desc')->get();
@@ -685,6 +758,7 @@ class HomeController extends Controller
 
         $filter_price = DB::table('tbl_product')
             ->whereBetween(DB::raw('CAST(product_price AS UNSIGNED)'), [$start_price, $end_price])
+            ->where('product_quantity','!=',0)
             ->orderBy('product_price', 'asc')
             ->paginate(6);
         return view('pages.filter_price')->with(compact('cart_detail', 'category', 'brand', 'filter_price', 'all_accessory'));
@@ -703,10 +777,16 @@ class HomeController extends Controller
         Session::put('low_to_high_cat', null);
         Session::put('high_to_low_cat', null);
         $searched = $request->searched;
-        $cart_detail = DB::table('tbl_cart_detail')->where('customer_id', Session::get('customer_id'))->get();
+        $cart_detail = DB::table('tbl_cart_detail')
+        ->join('tbl_product','tbl_product.product_id','=','tbl_cart_detail.product_id')
+        ->where('customer_id', Session::get('customer_id'))->get();
         $total_cart = 0;
         foreach ($cart_detail as $key => $v_cart_detail) {
-            $total_cart += $v_cart_detail->product_quantity;
+            if ($v_cart_detail->product_quantity !=0) {
+                $total_cart += $v_cart_detail->product_cart_quantity;
+            } else {
+                $total_cart = 0;
+            }
         }
         Session::put('total_cart', $total_cart);
         $category = Category::where('category_status', '1')->orderBy('category_slug', 'desc')->get();
@@ -733,7 +813,7 @@ class HomeController extends Controller
 
         }
         if (Session::get('low_to_high_search') != null) {
-            $query = DB::table('tbl_product')->where('product_name', 'like', '%' . $search . '%');
+            $query = DB::table('tbl_product')->where('product_quantity','!=',0)->where('product_name', 'like', '%' . $search . '%');
             $search_product = $query->orderBy(DB::raw('CAST(product_price AS DECIMAL(10,2))'), 'asc')
                 ->paginate(6);
 
@@ -742,7 +822,7 @@ class HomeController extends Controller
                 ->with('category', $category)
                 ->with('all_accessory', $all_accessory)->with('brand', $brand)->with('search_product', $search_product);
         } elseif (Session::get('high_to_low_search') != null) {
-            $query = DB::table('tbl_product')->where('product_name', 'like', '%' . $search . '%');
+            $query = DB::table('tbl_product')->where('product_quantity','!=',0)->where('product_name', 'like', '%' . $search . '%');
             $search_product = $query->orderBy(DB::raw('CAST(product_price AS DECIMAL(10,2))'), 'desc')
                 ->paginate(6);
 
@@ -751,7 +831,7 @@ class HomeController extends Controller
                 ->with('category', $category)
                 ->with('all_accessory', $all_accessory)->with('brand', $brand)->with('search_product', $search_product);
         } else {
-            $query = DB::table('tbl_product')->where('product_name', 'like', '%' . $search . '%');
+            $query = DB::table('tbl_product')->where('product_quantity','!=',0)->where('product_name', 'like', '%' . $search . '%');
             $search_product = $query->paginate(2)->appends($request->except('page'));
 
             return view('pages.search')
@@ -765,13 +845,13 @@ class HomeController extends Controller
     {
         $data = $request->all();
         if ($data['query']) {
-            $product = DB::table('tbl_product')->where('product_name', 'like', '%' . $data['query'] . '%')->get();
+            $product = DB::table('tbl_product')->where('product_quantity','!=',0)->where('product_name', 'like', '%' . $data['query'] . '%')->get();
             $output = '
                 <ul class = "dropdown-menu" style="display:block;width:100%;">';
             foreach ($product as $key => $value) {
                 $productUrl = url('/san-pham/' . $value->product_slug);
                 $output .= '
-                        <li class="text_complete" style="padding:0.5rem;font-size: 1.3rem;"><a class="dropdown-item" href="' . $productUrl . '">' . $value->product_name . '</a></li>
+                        <li class="text_complete" style="padding:0.5rem;font-size: 1.3rem;"><a class="search_item" href="' . $productUrl . '">' . $value->product_name . '</a></li>
                     ';
             }
             $output .= '</ul>';

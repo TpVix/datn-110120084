@@ -16245,7 +16245,18 @@ tbody .product-col {
   background-color: #08C;
   color: #fff;
 }
-
+.search_item{
+  display: block;
+  width: 100%;
+  padding: .25rem 1.5rem;
+  clear: both;
+  font-weight: 400;
+  color: #212529;
+  text-align: inherit;
+  /* white-space: nowrap; */
+  background-color: transparent;
+  border: 0;
+}
 i.cart-empty,
 i.wishlist-empty {
   font-size: 100px;

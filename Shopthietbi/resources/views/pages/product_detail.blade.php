@@ -232,14 +232,19 @@
                                     <?php
                                     $customer_id = Session::get('customer_id');
                                     ?>
-                                    @if ($customer_id == null)
-                                        <a href="{{ URL::to('/login-register') }}" class="btn btn-dark mr-2">ĐĂNG NHẬP ĐỂ
-                                            ĐẶT HÀNG</a>
+                                    @if ( $detail->product_quantity != 0)
+                                        @if ($customer_id == null)
+                                            <a href="{{ URL::to('/login-register') }}" class="btn btn-dark mr-2">ĐĂNG NHẬP ĐỂ
+                                                ĐẶT HÀNG</a>
+                                        @else
+                                            <button type="submit" href="#" class="btn btn-dark mr-2"><span><i
+                                                        class="fa-solid fa-cart-shopping"></i> THÊM VÀO GIỎ
+                                                    HÀNG</span></button>
+                                        @endif
                                     @else
-                                        <button type="submit" href="#" class="btn btn-dark mr-2"><span><i
-                                                    class="fa-solid fa-cart-shopping"></i> THÊM VÀO GIỎ
-                                                HÀNG</span></button>
+                                    <a  class="btn btn-dark mr-2">Sản phẩm đã hết hàng</a>
                                     @endif
+                                    
 
                                 </form>
                                 <form action="{{ URL::to('/add-wishlist') }}" id="form-wishlist" method="post"
@@ -376,17 +381,21 @@
                                             <?php
                                             $customer_id = Session::get('customer_id');
                                             ?>
-                                            @if ($customer_id == null)
-                                                <a href="{{ URL::to('/login-register') }}"
+                                            @if ($v_product_by_product_ids->product_quantity != 0)
+                                                @if ($customer_id == null)
+                                                    <a href="{{ URL::to('/login-register') }}"
                                                     class="btn-icon btn-add-cart1 product-type-simple">ĐĂNG NHẬP ĐỂ ĐẶT
                                                     HÀNG</a>
+                                                @else
+                                                    <button type="submit" href="#"
+                                                        class="btn-icon btn-add-cart1 product-type-simple"><i
+                                                            class="icon-shopping-cart"></i><span>THÊM VÀO GIỎ
+                                                            HÀNG</span></button>
+                                                @endif
                                             @else
-                                                <button type="submit" href="#"
-                                                    class="btn-icon btn-add-cart1 product-type-simple"><i
-                                                        class="icon-shopping-cart"></i><span>THÊM VÀO GIỎ
-                                                        HÀNG</span></button>
+                                                <span>Sản phẩm đã hết hàng</span>
                                             @endif
-
+                                                                
                                         </form>
                                     </div>
                                 </div>

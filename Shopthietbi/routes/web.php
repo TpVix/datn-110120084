@@ -98,13 +98,28 @@ Route::group(['middleware' => ['auth:admin', 'checkAdminRole:Quản trị viên'
     Route::post('/save-admin', 'AdminController@save_admin');
     Route::get('/delete-account/{admin_id}', 'AdminController@delete_account');
     Route::post('/permisstion/{role_id}', 'AdminController@permisstion');
+    //category
+    Route::get('/delete-category-product/{category_product_id}', 'CategoryProduct@delete_category_product');
+    //brand
+    Route::get('/delete-brand/{brand_product_id}', 'BrandProduct@delete_brand_product');
+    //Slider
+    Route::get('/delete-slider/{slider_id}', 'SliderControllder@delete_slider');
+    //Product
+    Route::get('/delete-product/{product_id}', 'ProductController@delete_product');
+    //product image
+    Route::get('/delete-image/{image_id}', 'ProductController@delete_image');
+    //promotion && product promotion
+    Route::get('/delete-promotion/{promotion_id}', 'PromotionController@delete_promotion');
+    //Accessory
+    Route::get('/delete-accessory/{accessory_id}', 'AccessoryController@delete_accessory');
+    //Promotion Accessory
+    Route::get('/delete-promotion-accessory/{promotion_accessory_id}', 'AccessoryController@delete_promotion_accessory');
 
 });
 //CategoryProduct
 Route::get('/add-category-product', 'CategoryProduct@add_category_product');
 Route::get('/edit-category-product/{category_product_id}', 'CategoryProduct@edit_category_product');
 Route::post('/update-category-product/{category_product_id}', 'CategoryProduct@update_category_product');
-Route::get('/delete-category-product/{category_product_id}', 'CategoryProduct@delete_category_product');
 
 Route::get('/list-category-product', 'CategoryProduct@list_category_product');
 Route::get('/active-category-product/{category_product_id}', 'CategoryProduct@active_category_product');
@@ -115,7 +130,6 @@ Route::post('/save-category-product', 'CategoryProduct@save_category_product');
 Route::get('/add-brand', 'BrandProduct@add_brand_product');
 Route::get('/edit-brand/{brand_product_id}', 'BrandProduct@edit_brand_product');
 Route::post('/update-brand/{brand_product_id}', 'BrandProduct@update_brand_product');
-Route::get('/delete-brand/{brand_product_id}', 'BrandProduct@delete_brand_product');
 
 Route::get('/list-brand', 'BrandProduct@list_brand_product');
 Route::get('/active-brand/{brand_product_id}', 'BrandProduct@active_brand_product');
@@ -128,7 +142,6 @@ Route::post('/save-slider', 'SliderControllder@save_slider');
 Route::get('/list-slider', 'SliderControllder@list_slider');
 Route::get('/change-option/{slider_id}', 'SliderControllder@change_option');
 Route::get('/status-slider/{slider_id}', 'SliderControllder@status_slider');
-Route::get('/delete-slider/{slider_id}', 'SliderControllder@delete_slider');
 Route::get('/edit-slider/{slider_id}', 'SliderControllder@edit_slider');
 Route::post('/update-slider/{slider_id}', 'SliderControllder@update_slider');
 
@@ -136,7 +149,6 @@ Route::post('/update-slider/{slider_id}', 'SliderControllder@update_slider');
 Route::get('/add-product', 'ProductController@add_product');
 Route::get('/edit-product/{product_id}', 'ProductController@edit_product');
 Route::post('/update-product/{product_id}', 'ProductController@update_product');
-Route::get('/delete-product/{product_id}', 'ProductController@delete_product');
 
 Route::get('/list-product', 'ProductController@list_product');
 Route::get('/active-product/{product_id}', 'ProductController@active_product');
@@ -148,7 +160,6 @@ Route::get('/add-image/{product_id}', 'ProductController@add_image');
 Route::post('/save-image', 'ProductController@save_image');
 Route::get('/edit-image/{image_id}', 'ProductController@edit_image');
 Route::post('/update-image/{image_id}', 'ProductController@update_image');
-Route::get('/delete-image/{image_id}', 'ProductController@delete_image');
 //promotion
 Route::get('/add-promotion', 'PromotionController@add_promotion');
 Route::get('/product-promotion/{promotion_id}', 'PromotionController@product_promotion');
@@ -158,7 +169,6 @@ Route::get('/delete-product-promotion/{product_id}', 'PromotionController@delete
 Route::post('/save-promotion', 'PromotionController@save_promotion');
 Route::get('/edit-promotion/{promotion_id}', 'PromotionController@edit_promotion');
 Route::post('/update-promotion/{promotion_id}', 'PromotionController@update_promotion');
-Route::get('/delete-promotion/{promotion_id}', 'PromotionController@delete_promotion');
 //accessory
 Route::get('/add-accessory', 'AccessoryController@add_accessory');
 Route::get('/product-accessory/{accessory_id}', 'AccessoryController@product_accessory');
@@ -168,7 +178,6 @@ Route::get('/delete-product-accessory/{product_id}', 'AccessoryController@delete
 Route::post('/save-accessory', 'AccessoryController@save_accessory');
 Route::get('/edit-accessory/{accessory_id}', 'AccessoryController@edit_accessory');
 Route::post('/update-accessory/{accessory_id}', 'AccessoryController@update_accessory');
-Route::get('/delete-accessory/{accessory_id}', 'AccessoryController@delete_accessory');
 //Promotion Accessory
 Route::get('/add-promotion-accessory', 'AccessoryController@add_promotion_accessory');
 Route::get('/product-promotion-accessory/{promotion_accessory_id}', 'AccessoryController@product_promotion_accessory');
@@ -178,7 +187,6 @@ Route::get('/delete-product-promotion-accessory/{product_id}', 'AccessoryControl
 Route::post('/save-promotion-accessory', 'AccessoryController@save_promotion_accessory');
 Route::get('/edit-promotion-accessory/{promotion_accessory_id}', 'AccessoryController@edit_promotion_accessory');
 Route::post('/update-promotion-accessory/{promotion_accessory_id}', 'AccessoryController@update_promotion_accessory');
-Route::get('/delete-promotion-accessory/{promotion_accessory_id}', 'AccessoryController@delete_promotion_accessory');
 //Manage Order
 Route::group(['middleware' => ['auth:admin', 'checkAdminRole:Quản trị viên,Quản lý']], function () {
     Route::get('/print-order/{checkout_code}', 'OrderController@print_order');

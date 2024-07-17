@@ -33,13 +33,20 @@ class CheckoutController extends Controller
         $shipping_fee = $this->shipping_fee();
 
         if (!$shipping_fee) {
-            $shipping_fee = 100000;
+            $shipping_fee = 30000;
         }
-        $cart_detail = DB::table('tbl_cart_detail')->where('customer_id', Session::get('customer_id'))->get();
+        $cart_detail = DB::table('tbl_cart_detail')
+        ->join('tbl_product','tbl_product.product_id','=','tbl_cart_detail.product_id')
+        ->where('customer_id', Session::get('customer_id'))->get();
         $total_cart = 0;
         foreach ($cart_detail as $key => $v_cart_detail) {
-            $total_cart += $v_cart_detail->product_quantity;
+            if ($v_cart_detail->product_quantity !=0) {
+                $total_cart += $v_cart_detail->product_cart_quantity;
+            } else {
+                $total_cart = 0;
+            }
         }
+        
         Session::put('total_cart', $total_cart);
         $order_code = $this->generateRandomString();
         return view('pages.checkout.checkout')
@@ -96,24 +103,29 @@ class CheckoutController extends Controller
         $payment_id = DB::table('tbl_payment')->insertGetId($data_payment);
         $order_quantity = 0;
 
-        $value_order_cart_detail = DB::table('tbl_cart_detail')
-            ->where('customer_id', Session::get('customer_id'))
-            ->get();
+        // $value_order_cart_detail = DB::table('tbl_cart_detail')
+        //     ->join('tbl_product','tbl_product.product_id','=','tbl_cart_detail.product_id')
+        //     ->where('customer_id', Session::get('customer_id'))
+        //     ->get();
 
-        foreach ($value_order_cart_detail as $v_order) {
-            $order_quantity += $v_order->product_quantity;
+        // foreach ($value_order_cart_detail as $v_order) {
+        //     if ($v_order->product_quantity !=0) {
+        //         $order_quantity += $v_order->product_cart_quantity;
+        //         $qty_old = DB::table('tbl_product')
+        //         ->where('product_id', $v_order->product_id)
+        //         ->first();
 
-            $qty_old = DB::table('tbl_product')
-                ->where('product_id', $v_order->product_id)
-                ->first();
-
-            if ($qty_old) {
-                $new_qty = $qty_old->product_quantity - $v_order->product_quantity;
-                DB::table('tbl_product')
-                    ->where('product_id', $qty_old->product_id)
-                    ->update(['product_quantity' => $new_qty]);
-            }
-        }
+        //     if ($qty_old) {
+        //         $new_qty = $qty_old->product_quantity - $v_order->product_cart_quantity;
+        //         DB::table('tbl_product')
+        //             ->where('product_id', $qty_old->product_id)
+        //             ->update(['product_quantity' => $new_qty]);
+        //     }
+        //     } else {
+        //         $order_quantity = 0;
+        //     }
+            
+        // }
 
 
         $data_order = array();
@@ -126,42 +138,63 @@ class CheckoutController extends Controller
         $data_order['shipping_fee'] = Session::get('shipping_fee');
         $data_order['order_status'] = 'Đang chờ xử lý';
         $order_id = DB::table('tbl_order')->insertGetId($data_order);
-        $cart_detail = DB::table('tbl_cart_detail')->where('customer_id', Session::get('customer_id'))->get();
+        Session::put('order_id', $order_id);
+        $cart_detail = DB::table('tbl_cart_detail')
+        ->join('tbl_product','tbl_product.product_id','=','tbl_cart_detail.product_id')
+        ->where('customer_id', Session::get('customer_id'))->get();
         $total_cart = 0;
         foreach ($cart_detail as $key => $v_cart_detail) {
-            $total_cart += $v_cart_detail->product_quantity;
+            if ($v_cart_detail->product_quantity !=0) {
+                $total_cart += $v_cart_detail->product_cart_quantity;
+            } else {
+                $total_cart = 0;
+            }
         }
         Session::put('total_cart', $total_cart);
         foreach ($cart_detail as $v_content) {
-            $data_order_detail = array();
-            $data_order_detail['order_id'] = $order_id;  // Correctly adding order_id to the detail array
-            $data_order_detail['product_id'] = $v_content->product_id;
-            $data_order_detail['product_image'] = $v_content->product_image;
-            $data_order_detail['product_name'] = $v_content->product_name;
-            $data_order_detail['product_price'] = $v_content->product_price;
-            $data_order_detail['product_quantity'] = $v_content->product_quantity;
-            DB::table('tbl_order_detail')->insert($data_order_detail);  // Inserting the detail into the database
-            DB::table('tbl_cart_detail')
-                ->where('customer_id', Session::get('customer_id'))
-                ->where('product_id', $v_content->product_id)->delete();
-            $qty_sold = DB::table('tbl_product')->where('product_id', $v_content->product_id)->first();
-            $quantity_sold = intval($qty_sold->quantity_sold) + $v_content->product_quantity;
-            DB::table('tbl_product')->where('product_id', $v_content->product_id)->update(['quantity_sold' => $quantity_sold]);
+            if ($v_content->product_quantity != 0) {
+                $data_order_detail = array();
+                $data_order_detail['order_id'] = $order_id;  // Correctly adding order_id to the detail array
+                $data_order_detail['product_id'] = $v_content->product_id;
+                $data_order_detail['product_image'] = $v_content->product_image;
+                $data_order_detail['product_name'] = $v_content->product_name;
+                $data_order_detail['product_price'] = $v_content->product_price;
+                $data_order_detail['product_quantity'] = $v_content->product_cart_quantity;
+                DB::table('tbl_order_detail')->insert($data_order_detail);  // Inserting the detail into the database
+                DB::table('tbl_cart_detail')
+                    ->where('customer_id', Session::get('customer_id'))
+                    ->where('product_id', $v_content->product_id)->delete();
+                $qty_sold = DB::table('tbl_product')->where('product_id', $v_content->product_id)->first();
+                $quantity_sold = intval($qty_sold->quantity_sold) + $v_content->product_cart_quantity;
+                DB::table('tbl_product')->where('product_id', $v_content->product_id)->update(['quantity_sold' => $quantity_sold]);
+               
+                $order_quantity += $v_content->product_cart_quantity;
+                $qty_old = DB::table('tbl_product')
+                ->where('product_id', $v_content->product_id)
+                ->first();
+                if ($qty_old) {
+                    $new_qty = $qty_old->product_quantity - $v_content->product_cart_quantity;
+                    DB::table('tbl_product')
+                        ->where('product_id', $qty_old->product_id)
+                        ->update(['product_quantity' => $new_qty]);
+                }
+            }else {
+                $order_quantity = 0;
+            }
+            
         }
-
-        Session::put('order_id', $order_id);
-
-
         $this->send_mail();
         Session::put('message', 'Đặt hàng thành công');
         return redirect('/history-order');
+        
     }
     public function send_mail()
     {
         Session::put('total_cart', 0);
         $customer_name = Session::get('customer_name');
         $order_name = DB::table('tbl_order')->where('order_id', Session::get('order_id'))->first();
-        $content = DB::table('tbl_order_detail')->where('order_id', Session::get('order_id'))->get();
+        $content = DB::table('tbl_order_detail')
+        ->where('order_id', Session::get('order_id'))->get();
         $data_order_detail = []; // Khởi tạo mảng trước vòng lặp
         foreach ($content as $v_content) {
             $data_order_detail[] = [ // Thêm dữ liệu vào mảng
@@ -291,27 +324,29 @@ class CheckoutController extends Controller
                 $payment_id = DB::table('tbl_payment')->insertGetId($data_payment);
                 $order_quantity = 0;
                 $value_order_cart_detail = DB::table('tbl_cart_detail')
-                    ->where('customer_id', Session::get('customer_id'))
-                    ->get();
+                ->join('tbl_product','tbl_product.product_id','=','tbl_cart_detail.product_id')
+                ->where('customer_id', Session::get('customer_id'))
+                ->get();
 
                 foreach ($value_order_cart_detail as $v_order) {
-                    // Cộng dồn số lượng sản phẩm từ giỏ hàng
-                    $order_quantity += $v_order->product_quantity;
-
-                    // Lấy số lượng sản phẩm hiện tại từ bảng sản phẩm
-                    $qty_old = DB::table('tbl_product')
+                    if ($v_order->product_quantity !=0) {
+                        $order_quantity += $v_order->product_cart_quantity;
+                        $qty_old = DB::table('tbl_product')
                         ->where('product_id', $v_order->product_id)
                         ->first();
-
+        
                     if ($qty_old) {
-                        // Tính số lượng sản phẩm mới sau khi trừ đi số lượng đã đặt
-                        $new_qty = $qty_old->product_quantity - $v_order->product_quantity;
-                        // Cập nhật số lượng sản phẩm mới vào bảng sản phẩm
+                        $new_qty = $qty_old->product_quantity - $v_order->product_cart_quantity;
                         DB::table('tbl_product')
                             ->where('product_id', $qty_old->product_id)
                             ->update(['product_quantity' => $new_qty]);
                     }
+                    } else {
+                        $order_quantity = 0;
+                    }
+                    
                 }
+        
                 $data_order = array();
                 $data_order['customer_id'] = Session::get('customer_id');
                 $data_order['shipping_id'] = $shipping_id;
@@ -322,30 +357,39 @@ class CheckoutController extends Controller
                 $data_order['shipping_fee'] = Session::get('shipping_fee');
                 $data_order['order_status'] = 'Đang chờ xử lý';
                 $order_id = DB::table('tbl_order')->insertGetId($data_order);
-                $cart_detail = DB::table('tbl_cart_detail')->where('customer_id', Session::get('customer_id'))->get();
+                $cart_detail = DB::table('tbl_cart_detail')
+                ->join('tbl_product','tbl_product.product_id','=','tbl_cart_detail.product_id')
+                ->where('customer_id', Session::get('customer_id'))->get();
                 $total_cart = 0;
                 foreach ($cart_detail as $key => $v_cart_detail) {
-                    $total_cart += $v_cart_detail->product_quantity;
-                }
-                Session::put('total_cart', $total_cart);
-                foreach ($cart_detail as $v_content) {
-                    $data_order_detail = array();
-                    $data_order_detail['order_id'] = $order_id;  // Correctly adding order_id to the detail array
-                    $data_order_detail['product_id'] = $v_content->product_id;
-                    $data_order_detail['product_image'] = $v_content->product_image;
-                    $data_order_detail['product_name'] = $v_content->product_name;
-                    $data_order_detail['product_price'] = $v_content->product_price;
-                    $data_order_detail['product_quantity'] = $v_content->product_quantity;
-                    DB::table('tbl_order_detail')->insert($data_order_detail);  // Inserting the detail into the database
-                    DB::table('tbl_cart_detail')
-                        ->where('customer_id', Session::get('customer_id'))
-                        ->where('product_id', $v_content->product_id)->delete();
-                    $qty_sold = DB::table('tbl_product')->where('product_id', $v_content->product_id)->first();
-                    $quantity_sold = intval($qty_sold->quantity_sold) + $v_content->product_quantity;
-                    DB::table('tbl_product')->where('product_id', $v_content->product_id)->update(['quantity_sold' => $quantity_sold]);
+                    if ($v_cart_detail->product_quantity !=0) {
+                        $total_cart += $v_cart_detail->product_cart_quantity;
+                    } else {
+                        $total_cart = 0;
+                    }
                 }
 
-                Session::put('order_id', $order_id);
+                Session::put('total_cart', $total_cart);
+                foreach ($cart_detail as $v_content) {
+                    if ($v_content->product_quantity != 0) {
+                        $data_order_detail = array();
+                        $data_order_detail['order_id'] = $order_id;  // Correctly adding order_id to the detail array
+                        $data_order_detail['product_id'] = $v_content->product_id;
+                        $data_order_detail['product_image'] = $v_content->product_image;
+                        $data_order_detail['product_name'] = $v_content->product_name;
+                        $data_order_detail['product_price'] = $v_content->product_price;
+                        $data_order_detail['product_quantity'] = $v_content->product_cart_quantity;
+                        DB::table('tbl_order_detail')->insert($data_order_detail);  // Inserting the detail into the database
+                        DB::table('tbl_cart_detail')
+                            ->where('customer_id', Session::get('customer_id'))
+                            ->where('product_id', $v_content->product_id)->delete();
+                        $qty_sold = DB::table('tbl_product')->where('product_id', $v_content->product_id)->first();
+                        $quantity_sold = intval($qty_sold->quantity_sold) + $v_content->product_cart_quantity;
+                        DB::table('tbl_product')->where('product_id', $v_content->product_id)->update(['quantity_sold' => $quantity_sold]);
+                        Session::put('order_id', $order_id);
+                    }
+        
+                }
                 $this->send_mail();
                 Session::put('message', 'Thanh toán thành công');
                 return redirect('/history-order')->with('success', 'Thanh toán thành công');

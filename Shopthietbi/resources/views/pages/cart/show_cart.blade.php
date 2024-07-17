@@ -18,11 +18,18 @@
 
                 </ul>
                 <?php
+                $msg_update_cart=Session::get('msg_update_cart');
                 $delete_cart = Session::get('delete_cart');
                 if ($delete_cart) {
                     echo "<div class='alert alert-success'>$delete_cart</div>";
                     for ($i = 0; $i < 2; $i++) {
                         Session::put('delete_cart', null);
+                    }
+                }
+                if ($msg_update_cart) {
+                    echo "<div class='alert alert-success'>$msg_update_cart</div>";
+                    for ($i = 0; $i < 2; $i++) {
+                        Session::put('msg_update_cart', null);
                     }
                 }
                 ?>
@@ -47,7 +54,7 @@
                                     @endphp
                                     @foreach ($cart_detail as $key => $cart)
                                         @php
-
+                                        if ($cart->product_quantity!=0) {
                                             $product = DB::table('tbl_product')
                                                 ->where('tbl_product.product_id', $cart->product_id)
                                                 ->get();
@@ -55,9 +62,24 @@
                                                 Session::put('product_slug', $pro_slug->product_slug);
 
                                                 $product_slug = Session::get('product_slug');
+   
                                             }
-                                            $subtotal = $cart->product_price * $cart->product_quantity;
+                                            $subtotal = $cart->product_price * $cart->product_cart_quantity;
                                             $total += $subtotal;
+                                        }else {
+                                            $product = DB::table('tbl_product')
+                                                ->where('tbl_product.product_id', $cart->product_id)
+                                                ->get();
+                                            foreach ($product as $slug => $pro_slug) {
+                                                Session::put('product_slug', $pro_slug->product_slug);
+
+                                                $product_slug = Session::get('product_slug');
+   
+                                            }
+                                            $subtotal = 0;
+                                            $total += $subtotal;
+                                        }
+
                                         @endphp
                                         <tr class="product-row">
                                             <td>
@@ -83,6 +105,10 @@
                                             </td>
                                             <td>{{ number_format($cart->product_price, 0, ',', '.') }}đ</td>
                                             <td>
+                                                @if ($cart->product_quantity == 0)
+                                                Sản phẩm đã hết hàng
+
+                                                @else
                                                 <form action="{{ URL::to('/update-cart/' . $cart->product_id) }}"
                                                     method="post" style="margin-bottom:0px;">
                                                     @csrf
@@ -91,7 +117,7 @@
 
                                                         <input class="horizontal-quantity form-control"
                                                             name="cart_qty_{{ $cart->product_id }}"
-                                                            value="{{ $cart->product_quantity }}" type="text">
+                                                            value="{{ $cart->product_cart_quantity }}" type="text">
 
                                                         <div class="float-center">
                                                             <button type="submit" class="btn btn-shop btn-update-cart"
@@ -102,6 +128,7 @@
 
                                                     </div><!-- End .product-single-qty -->
                                                 </form>
+                                                @endif
                                             </td>
                                             <td class="text-right"><span
                                                     class="subtotal-price">{{ number_format($subtotal, 0, ',', '.') }}đ</span>
@@ -147,11 +174,15 @@
 
 
                             </table>
-
+                            @if ($total == 0)
+                                
+                            @else
                             <div class="checkout-methods">
                                 <a href="{{ URL::to('/checkout') }}" class="btn btn-block btn-dark">Thanh toán
                                     <i class="fa fa-arrow-right"></i></a>
                             </div>
+                            @endif
+                           
                         </div><!-- End .cart-summary -->
                     </div><!-- End .col-lg-4 -->
                 </div><!-- End .row -->

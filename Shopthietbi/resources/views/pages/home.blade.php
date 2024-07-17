@@ -173,6 +173,7 @@
                                            
                                             ->where('promotion_id', $v_selling_products->promotion_id)
                                             ->get();
+                                        
                                     @endphp
                                     <div class="price-box">
                                        
@@ -474,6 +475,7 @@
                 @foreach ($active_promotion as $v_active_promotion)
                     @php
                         $product_promotion = DB::table('tbl_product')
+                            ->where('product_quantity','!=',0)
                             ->where('promotion_id', $v_active_promotion->promotion_id)
                             ->get();
                     @endphp

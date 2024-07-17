@@ -87,8 +87,8 @@
 
 
 
-                                                    <a class="btn btn-outline-danger"
-                                                        href="{{ URL::to('/delete-account/' . $all->admin_id) }}">Xoá</a>
+                                                    {{-- <a class="btn btn-outline-danger"
+                                                        href="{{ URL::to('/delete-account/' . $all->admin_id) }}">Xoá</a> --}}
                                                 </div>
 
                                             </td>

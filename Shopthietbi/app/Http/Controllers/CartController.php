@@ -41,11 +41,22 @@ class CartController extends Controller
         $category = Category::where('category_status', '1')->orderBy('category_slug', 'desc')->get();
         $all_accessory = DB::table('tbl_accessory')->where('accessory_status', 'Hiện')->orderBy('accessory_id', 'desc')->get();
         $brand = Brand::where('brand_status', '1')->orderBy('brand_id', 'desc')->get();
-        $cart_detail = DB::table('tbl_cart_detail')->where('customer_id', Session::get('customer_id'))->get();
+        $cart_detail = DB::table('tbl_cart_detail')
+        ->join('tbl_product','tbl_product.product_id','=','tbl_cart_detail.product_id')
+        ->where('customer_id', Session::get('customer_id'))->get();
+
         $total_cart = 0;
+        
         foreach ($cart_detail as $key => $v_cart_detail) {
-            $total_cart += $v_cart_detail->product_quantity;
+            if ($v_cart_detail->product_quantity !=0) {
+                $total_cart += $v_cart_detail->product_cart_quantity;
+            } else {
+                $total_cart = 0;
+            }
+            
+            
         }
+
         Session::put('total_cart', $total_cart);
         return view('pages.cart.show_cart')
             ->with('cart_detail', $cart_detail)
@@ -70,13 +81,13 @@ class CartController extends Controller
         $cart_quantity = $request->input('cart_qty_' . $product_id);
         foreach ($value_product as $key => $v_product) {
 
-            if ($cart_quantity && $cart_quantity > 0 && $cart_quantity < $v_product->product_quantity) {
+            if ($cart_quantity && $cart_quantity > 0 && $cart_quantity <= $v_product->product_quantity) {
                 DB::table('tbl_cart_detail')
                     ->where('product_id', $product_id)
                     ->where('customer_id', Session::get('customer_id'))
-                    ->update(['product_quantity' => $cart_quantity]);
+                    ->update(['product_cart_quantity' => $cart_quantity]);
             } else {
-                Session::put('message', 'Số lượng không hợp lệ');
+                Session::put('msg_update_cart', 'Số lượng không hợp lệ');
             }
         }
         return Redirect()->back();
@@ -85,10 +96,16 @@ class CartController extends Controller
 
     public function add_cart(Request $request)
     {
-        $cart_detail = DB::table('tbl_cart_detail')->where('customer_id', Session::get('customer_id'))->get();
+        $cart_detail = DB::table('tbl_cart_detail')
+        ->join('tbl_product','tbl_product.product_id','=','tbl_cart_detail.product_id')
+        ->where('customer_id', Session::get('customer_id'))->get();
         $total_cart = 0;
         foreach ($cart_detail as $key => $v_cart_detail) {
-            $total_cart += $v_cart_detail->product_quantity;
+            if ($v_cart_detail->product_quantity !=0) {
+                $total_cart += $v_cart_detail->product_cart_quantity;
+            } else {
+                $total_cart = 0;
+            }
         }
         Session::put('total_cart', $total_cart);
         
@@ -106,7 +123,7 @@ class CartController extends Controller
                 $data_cart_detail['product_image'] = $request->cart_product_image;
                 $data_cart_detail['product_name'] = $request->cart_product_name;
                 $data_cart_detail['product_price'] = $request->cart_product_price;
-                $data_cart_detail['product_quantity'] = $request->cart_product_qty;
+                $data_cart_detail['product_cart_quantity'] = $request->cart_product_qty;
                 DB::table('tbl_cart_detail')->insert($data_cart_detail);
             } else {
                 $product_exist = false;
@@ -118,7 +135,12 @@ class CartController extends Controller
                         $data_cart_detail['product_image'] = $request->cart_product_image;
                         $data_cart_detail['product_name'] = $request->cart_product_name;
                         $data_cart_detail['product_price'] = $request->cart_product_price;
-                        $data_cart_detail['product_quantity'] = $v_cart_detail->product_quantity + $request->cart_product_qty;
+                        if($v_cart_detail->product_cart_quantity + $request->cart_product_qty>$v_cart_detail->product_quantity){
+                        $data_cart_detail['product_cart_quantity'] = $v_cart_detail->product_quantity;
+                        }else{
+                            $data_cart_detail['product_cart_quantity'] = $v_cart_detail->product_cart_quantity + $request->cart_product_qty;
+
+                        }
                         DB::table('tbl_cart_detail')->where('cart_detail_id', $v_cart_detail->cart_detail_id)->update($data_cart_detail);
                         $product_exist = true;
                         break;
@@ -131,7 +153,7 @@ class CartController extends Controller
                     $data_cart_detail['product_image'] = $request->cart_product_image;
                     $data_cart_detail['product_name'] = $request->cart_product_name;
                     $data_cart_detail['product_price'] = $request->cart_product_price;
-                    $data_cart_detail['product_quantity'] = $request->cart_product_qty;
+                    $data_cart_detail['product_cart_quantity'] = $request->cart_product_qty;
                     DB::table('tbl_cart_detail')->insert($data_cart_detail);
                 }
             }

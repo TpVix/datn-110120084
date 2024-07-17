@@ -74,7 +74,7 @@
                                         <th>Tên</th>
                                         
 
-                                        <th></th>
+                                        {{-- <th></th> --}}
                                     </tr>
                                 </thead>
 
@@ -86,12 +86,12 @@
                                             <td>{{ $v_product_accessory->product_name }}</td>
 
                                             
-                                            <td>
+                                            {{-- <td>
                                                 <div class="btn-group">
                                                     <a onclick="return confirm('Bạn có chắc muốn xoá ?')" href="{{URL::to('/delete-product-accessory/'.$v_product_accessory->product_id)}}" class="btn btn-outline-danger">Xoá</a>
                                                     
                                                 </div>
-                                            </td>
+                                            </td> --}}
                                         </tr>
                                     @endforeach
                                 </tbody>

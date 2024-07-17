@@ -158,7 +158,7 @@
 
                                                     <div class="dropdown-menu">
                                                         <a class="dropdown-item" href="{{url('/edit-promotion/'.$v_promotion->promotion_id)}}">Sửa</a>
-                                                        <a class="dropdown-item" href="{{url('/delete-promotion/'.$v_promotion->promotion_id)}}">Xoá</a>
+                                                        {{-- <a class="dropdown-item" href="{{url('/delete-promotion/'.$v_promotion->promotion_id)}}">Xoá</a> --}}
                                                     </div>
                                                 </div>
                                             </td>

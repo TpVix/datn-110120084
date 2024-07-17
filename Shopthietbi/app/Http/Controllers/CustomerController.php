@@ -18,7 +18,9 @@ class CustomerController extends Controller
 {
     public function address()
     {
-        $cart_detail = DB::table('tbl_cart_detail')->where('customer_id', Session::get('customer_id'))->get();
+        $cart_detail = DB::table('tbl_cart_detail')
+        ->join('tbl_product','tbl_product.product_id','=','tbl_cart_detail.product_id')
+        ->where('customer_id', Session::get('customer_id'))->get();
         $category = Category::where('category_status', '1')->orderBy('category_slug', 'desc')->get();
         $all_accessory = DB::table('tbl_accessory')->orderBy('accessory_id', 'desc')->get();
         $brand = Brand::where('brand_status', '1')->orderBy('brand_slug', 'desc')->get();
@@ -41,7 +43,9 @@ class CustomerController extends Controller
     public function add_address()
     {
         $city = DB::table('tbl_tinhthanhpho')->orderBy('matp', 'ASC')->get();
-        $cart_detail = DB::table('tbl_cart_detail')->where('customer_id', Session::get('customer_id'))->get();
+        $cart_detail = DB::table('tbl_cart_detail')
+        ->join('tbl_product','tbl_product.product_id','=','tbl_cart_detail.product_id')
+        ->where('customer_id', Session::get('customer_id'))->get();
         $category = Category::where('category_status', '1')->orderBy('category_slug', 'desc')->get();
         $all_accessory = DB::table('tbl_accessory')->orderBy('accessory_id', 'desc')->get();
         $brand = Brand::where('brand_status', '1')->orderBy('brand_slug', 'desc')->get();
@@ -88,7 +92,9 @@ class CustomerController extends Controller
         $city = DB::table('tbl_tinhthanhpho')->orderBy('matp', 'ASC')->get();
         $district = DB::table('tbl_quanhuyen')->orderBy('maqh', 'ASC')->get();
         $ward = DB::table('tbl_xaphuongthitran')->orderBy('xaid', 'ASC')->get();
-        $cart_detail = DB::table('tbl_cart_detail')->where('customer_id', Session::get('customer_id'))->get();
+        $cart_detail = DB::table('tbl_cart_detail')
+        ->join('tbl_product','tbl_product.product_id','=','tbl_cart_detail.product_id')
+        ->where('customer_id', Session::get('customer_id'))->get();
         $category = Category::where('category_status', '1')->orderBy('category_slug', 'desc')->get();
         $all_accessory = DB::table('tbl_accessory')->orderBy('accessory_id', 'desc')->get();
         $brand = Brand::where('brand_status', '1')->orderBy('brand_slug', 'desc')->get();
@@ -171,7 +177,6 @@ class CustomerController extends Controller
         try {
             $users = Socialite::driver('google')->stateless()->user();
         } catch (\Exception $e) {
-            // Nếu người dùng chọn hủy xác thực, bắt ngoại lệ và chuyển hướng về trang đăng nhập hoặc trang chủ với thông báo lỗi.
             return redirect('/login-register');
         }
         // return $users->id;
@@ -231,7 +236,9 @@ class CustomerController extends Controller
     }
     public function history_order()
     {
-        $cart_detail = DB::table('tbl_cart_detail')->where('customer_id', Session::get('customer_id'))->get();
+        $cart_detail = DB::table('tbl_cart_detail')
+        ->join('tbl_product','tbl_product.product_id','=','tbl_cart_detail.product_id')
+        ->where('customer_id', Session::get('customer_id'))->get();
         $category = Category::where('category_status', '1')->orderBy('category_slug', 'desc')->get();
         $all_accessory = DB::table('tbl_accessory')->orderBy('accessory_id', 'desc')->get();
         $brand = Brand::where('brand_status', '1')->orderBy('brand_slug', 'desc')->get();
@@ -284,7 +291,9 @@ class CustomerController extends Controller
     }
     public function order_detail($order_id)
     {
-        $cart_detail = DB::table('tbl_cart_detail')->where('customer_id', Session::get('customer_id'))->get();
+        $cart_detail = DB::table('tbl_cart_detail')
+        ->join('tbl_product','tbl_product.product_id','=','tbl_cart_detail.product_id')
+        ->where('customer_id', Session::get('customer_id'))->get();
         $category = Category::where('category_status', '1')->orderBy('category_slug', 'desc')->get();
         $all_accessory = DB::table('tbl_accessory')->orderBy('accessory_id', 'desc')->get();
         $brand = Brand::where('brand_status', '1')->orderBy('brand_slug', 'desc')->get();
@@ -315,7 +324,9 @@ class CustomerController extends Controller
     }
     public function show_wishlist()
     {
-        $cart_detail = DB::table('tbl_cart_detail')->where('customer_id', Session::get('customer_id'))->get();
+        $cart_detail = DB::table('tbl_cart_detail')
+        ->join('tbl_product','tbl_product.product_id','=','tbl_cart_detail.product_id')
+        ->where('customer_id', Session::get('customer_id'))->get();
         $category = Category::where('category_status', '1')->orderBy('category_slug', 'desc')->get();
         $all_accessory = DB::table('tbl_accessory')->orderBy('accessory_id', 'desc')->get();
         $brand = Brand::where('brand_status', '1')->orderBy('brand_slug', 'desc')->get();
